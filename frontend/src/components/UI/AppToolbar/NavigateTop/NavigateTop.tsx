@@ -18,7 +18,7 @@ interface Props {
   close?: () => void;
 }
 
-// Обертка для NavigateTop, чтобы установить z-index
+// Обертка для NavigateTop, чтобы установить z-indeх
 const NavigateTopWrapper = styled(Box)({
   position: 'relative',
   zIndex: 1101, // Установите z-index равным или больше, чем у AppBar, чтобы NavigateTop был поверх AppBar
