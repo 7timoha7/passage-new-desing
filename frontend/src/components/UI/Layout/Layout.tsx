@@ -4,13 +4,11 @@ import AppToolbar from '../AppToolbar/AppToolbar';
 import MenuCategories from '../../../features/MenuCategories/components/MenuCategories';
 import Footer from '../Footer/Footer';
 import { useLocation } from 'react-router-dom';
-import BreadcrumbsPage from '../BreadcrumbsPage/BreadcrumbsPage';
 import Bestsellers from '../../../features/Bestsellers/Bestsellers';
 import ProductsNews from '../../../features/Products/components/ProductsNews';
 import ProductsFor from '../../../features/ProductsFor/components/ProductsFor';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { selectProductsForID, setProductsForID } from '../../../features/ProductsFor/productsForSlice';
-import { toolbarTobAndBottomColor } from '../../../styles';
 import BannerTop from '../../../features/Banners/BannerTop';
 import BannersMiddle from '../../../features/Banners/BannersMiddle';
 import BannersBottom from '../../../features/Banners/BannersBottom';
@@ -40,11 +38,11 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <header>
         <AppToolbar />
       </header>
-      <Box sx={{ background: toolbarTobAndBottomColor }}>
-        <Container maxWidth={'xl'} sx={{ color: '#ffffff' }}>
-          <BreadcrumbsPage />
-        </Container>
-      </Box>
+      {/*<Box sx={{ background: toolbarTobAndBottomColor }}>*/}
+      {/*  <Container maxWidth={'xl'} sx={{ color: '#ffffff' }}>*/}
+      {/*    <BreadcrumbsPage />*/}
+      {/*  </Container>*/}
+      {/*</Box>*/}
       <MenuCategories />
 
       {location.pathname === '/' && (

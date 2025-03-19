@@ -1,15 +1,22 @@
 import img1 from '../../frontend/src/assets/images/newFon/13.jpeg';
 
 export const ToolBarTopText = {
-  color: 'rgb(255,255,255)',
+  color: '#1D1D1D',
   fontSize: '15px',
   textDecoration: 'none',
   marginRight: '50px',
   ':hover': { color: '#ddbe86' },
 };
 
+export const ToolBarTopTextSearchBasket = {
+  color: '#1D1D1D',
+  fontSize: '9px',
+  textDecoration: 'none',
+  ':hover': { color: '#ddbe86' },
+};
+
 //цвет боковых граней с верху и с низу от тулбара
-export const toolbarTobAndBottomColor = '#5a1e1e';
+export const toolbarTobAndBottomColor = '#FFFFFF';
 
 export const ToolBarStyles = {
   backgroundImage: `url(${img1})`,

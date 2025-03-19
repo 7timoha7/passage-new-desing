@@ -8,8 +8,10 @@ import UserMenu from '../UserMenu';
 import AnonymousMenu from '../AnonymousMenu';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectUser } from '../../../../features/users/usersSlice';
-import { toolbarTobAndBottomColor, ToolBarTopText } from '../../../../styles';
+import { toolbarTobAndBottomColor, ToolBarTopText, ToolBarTopTextSearchBasket } from '../../../../styles';
 import ForUsers from './Components/ForClients/ForUsers/ForUsers';
+import SearchIcon from '@mui/icons-material/Search';
+import Basket from '../../../../features/Basket/Basket';
 import LinkTel from './Components/LinkTel';
 
 interface Props {
@@ -26,10 +28,6 @@ const NavigateTopWrapper = styled(Box)({
 
 const NavigateTop: React.FC<Props> = ({ close }) => {
   const menu = [
-    {
-      name: 'Главная',
-      link: '/',
-    },
     {
       name: 'Новинки',
       link: '/productsNews',
@@ -61,7 +59,13 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
         },
       }}
     >
-      <Box display="flex" flexWrap={'wrap'} alignItems={'center'}>
+      <Box>
+        <Link to="/" style={{ margin: 'auto' }}>
+          <img style={{ maxWidth: '170px' }} src="/logo_black.png" alt="passage" />
+        </Link>
+      </Box>
+
+      <Box display="flex" flexWrap={'wrap'} alignItems={'center'} sx={{ padding: '7px' }}>
         <Box
           sx={{
             '@media (max-width: 1200px)': {
@@ -92,11 +96,24 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
           <ForUsers close={close} />
         </Box>
       </Box>
-      {isMobileMenu && (
-        <Box>
-          <LinkTel />
-        </Box>
-      )}
+
+      <Box>
+        {isMobileMenu && (
+          <Box>
+            <LinkTel />
+          </Box>
+        )}
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Button sx={ToolBarTopTextSearchBasket} color="inherit">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <SearchIcon fontSize={'medium'} />
+            <p style={{ fontSize: '9px', margin: 0, padding: 0 }}>Поиск</p>
+          </div>
+        </Button>
+
+        <Basket />
+      </Box>
 
       <Box display={user !== null || location.pathname === '/admin' ? 'flex' : 'none'} alignItems="center">
         {user && <UserMenu close={close} user={user} />}

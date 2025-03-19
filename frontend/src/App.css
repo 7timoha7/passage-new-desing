@@ -3,12 +3,21 @@ main {
   padding: 0;
 }
 
+@font-face {
+  font-family: 'Inter';
+  src: url('./assets/fons/Inter/static/Inter_18pt-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background-image: url('../src/assets/images/newFon/17.jpeg'); /* Путь к вашему изображению */
+  background-image: url('../src/assets/images/newFon/17.jpeg');
   background-repeat: repeat;
+  font-family: 'Inter', sans-serif;
 }
+
 
 @font-face {
   font-family: 'Montserrat';

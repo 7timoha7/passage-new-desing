@@ -2,6 +2,9 @@ import { createTheme } from '@mui/material';
 import { toolbarTobAndBottomColor } from './styles';
 
 const theme = createTheme({
+  typography: {
+    fontFamily: 'Inter, sans-serif',
+  },
   components: {
     MuiTextField: {
       // Общие настройки для MuiTextField

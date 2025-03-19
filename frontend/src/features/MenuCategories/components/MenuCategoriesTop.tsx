@@ -105,7 +105,7 @@ const MenuCategoriesTop: React.FC = () => {
               <a href="#">
                 <div style={{ display: 'flex', alignItems: 'center', marginRight: '25px' }}>
                   <MenuIcon fontSize={'medium'} sx={{ mr: 1 }} />
-                  <span>{'Продукция'}</span>
+                  <span>{'Каталог'}</span>
                 </div>
               </a>
               {category.subcategories && category.subcategories.length > 0 && (
