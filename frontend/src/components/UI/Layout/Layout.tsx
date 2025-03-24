@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Container, useMediaQuery } from '@mui/material';
 import AppToolbar from '../AppToolbar/AppToolbar';
 import MenuCategories from '../../../features/MenuCategories/components/MenuCategories';
@@ -22,6 +22,8 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const dispatch = useAppDispatch();
   const banners = useAppSelector(selectBanners);
   const fetchBannersLoading = useAppSelector(selectFetchBannersLoading);
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+  const [toolbarHeight, setToolbarHeight] = useState(0);
 
   useEffect(() => {
     dispatch(fetchBanners());
@@ -33,16 +35,24 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
     }
   }, [dispatch, location.pathname]);
 
+  useEffect(() => {
+    if (toolbarRef.current) {
+      setToolbarHeight(toolbarRef.current.offsetHeight);
+    }
+  }, []);
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <header>
+      <header
+        ref={toolbarRef}
+        style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1100, borderBottom: '1px solid grey' }}
+      >
         <AppToolbar />
       </header>
-      {/*<Box sx={{ background: toolbarTobAndBottomColor }}>*/}
-      {/*  <Container maxWidth={'xl'} sx={{ color: '#ffffff' }}>*/}
-      {/*    <BreadcrumbsPage />*/}
-      {/*  </Container>*/}
-      {/*</Box>*/}
+
+      {/* Динамический отступ, равный высоте AppToolbar */}
+      <Box sx={{ height: `${toolbarHeight}px` }} />
+
       <MenuCategories />
 
       {location.pathname === '/' && (
@@ -52,24 +62,15 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       )}
 
       <Container maxWidth={'xl'} sx={{ mb: 2 }}>
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-          }}
-        >
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
           <Box maxWidth={'100%'} component="main" sx={{ flex: 1, boxSizing: 'border-box' }}>
             {children}
           </Box>
         </Box>
       </Container>
+
       <Container maxWidth={'xl'} sx={{ mb: 2 }}>
-        {location.pathname === '/' && (
-          <>
-            <Bestsellers />
-          </>
-        )}
+        {location.pathname === '/' && <Bestsellers />}
       </Container>
 
       {location.pathname === '/' && (
@@ -79,9 +80,7 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       )}
 
       <Container maxWidth={'xl'} sx={{ mb: 2 }}>
-        {location.pathname.includes('/product/') && (
-          <>{productsForID && <ProductsFor categoriesID={productsForID} />}</>
-        )}
+        {location.pathname.includes('/product/') && productsForID && <ProductsFor categoriesID={productsForID} />}
         {location.pathname === '/' && <ProductsNews />}
       </Container>
 

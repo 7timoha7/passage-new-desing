@@ -18,7 +18,7 @@ const LinkTel = () => {
       sx={{
         color: 'rgb(0,0,0)',
         fontSize: '15px',
-        fontWeight: 'bold',
+        // fontWeight: 'bold',
         display: 'flex',
         alignItems: 'center',
         cursor: 'pointer',
@@ -26,7 +26,7 @@ const LinkTel = () => {
       }}
     >
       <CallIcon sx={{ mr: 0.7 }} />
-      {/*+996 553 100500*/}
+      +996 553 100500
     </Link>
   );
 };
