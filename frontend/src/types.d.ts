@@ -294,3 +294,9 @@ export interface DiscountType {
   phone: string;
   source: string;
 }
+
+export interface CategoryImageType {
+  _id: string;
+  ID: string;
+  images: string[] | null;
+}

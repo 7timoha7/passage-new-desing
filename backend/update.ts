@@ -184,6 +184,11 @@ const run = async () => {
           continue;
         }
 
+        // проверка на деск и фото
+        if (!productData.description || (!productData.imageBase64?.trim() && !productData.imagesBase64?.length)) {
+          continue;
+        }
+
         // Проверяем, есть ли остатки только на складе 'Склад материалов (не для продажи)'
         const hasOnlyExcludedWarehouseStock = quantityDataArray.every((q) => {
           const stock = quantitiesStocks.find((qs) => qs.stockID === q.stockID);
@@ -361,39 +366,48 @@ const run = async () => {
 
   const createCategories = async (categoriesData: ICategoryFromApi[]): Promise<void> => {
     try {
-      // Шаг 1: Создаем категории, в которых есть товары
+      const createdCategories = new Set<string>(); // Храним уже созданные категории
+
       for (const categoryData of categoriesData) {
         const productsForCategory = await Product.find({ ownerID: categoryData.ID });
+
         if (productsForCategory.length > 0) {
-          const newCategory = new Category({
-            name: categoryData.name,
-            ID: categoryData.ID,
-            ownerID: categoryData.ownerID,
-            productsHave: true,
-          });
-          await newCategory.save();
-        }
-      }
-
-      // Шаг 2: Создаем вышестоящие категории
-      for (const categoryData of categoriesData) {
-        // Находим родительскую категорию
-        const ownerCategory = categoriesData.find((item) => item.ID === categoryData.ownerID);
-
-        // Проверяем, есть ли такая родительская категория и создана ли она
-        if (ownerCategory && !(await Category.exists({ ID: ownerCategory.ID }))) {
-          const newCategory = new Category({
-            name: ownerCategory.name,
-            ID: ownerCategory.ID,
-            ownerID: ownerCategory.ownerID,
-          });
-          await newCategory.save();
+          await createCategoryWithParents(categoryData, categoriesData, createdCategories);
         }
       }
 
       console.log('Все категории успешно созданы в базе данных.');
     } catch (error) {
       console.error('Ошибка при создании категорий:', error);
+    }
+  };
+
+  const createCategoryWithParents = async (
+    categoryData: ICategoryFromApi,
+    categoriesData: ICategoryFromApi[],
+    createdCategories: Set<string>,
+  ): Promise<void> => {
+    if (createdCategories.has(categoryData.ID)) return; // Если уже создана, выходим
+
+    // Если у категории есть родитель, сначала создаем его
+    if (categoryData.ownerID) {
+      const parentCategory = categoriesData.find((item) => item.ID === categoryData.ownerID);
+      if (parentCategory) {
+        await createCategoryWithParents(parentCategory, categoriesData, createdCategories);
+      }
+    }
+
+    // Проверяем, существует ли уже такая категория в БД
+    if (!(await Category.exists({ ID: categoryData.ID }))) {
+      const newCategory = new Category({
+        name: categoryData.name,
+        ID: categoryData.ID,
+        ownerID: categoryData.ownerID,
+        productsHave: !!(await Product.exists({ ownerID: categoryData.ID })), // true, если в категории есть товары
+      });
+
+      await newCategory.save();
+      createdCategories.add(categoryData.ID);
     }
   };
 
@@ -493,6 +507,26 @@ const run = async () => {
   const responseQuantity = await fetchData('goods-quantity-get');
   const responsePrice = await fetchData('goods-price-get');
 
+  // ////////////////////////////////////////////////////////
+  // // Вместо ожидания результата запроса, сохраняем его в переменную
+  // const goodsData = await fetchData('goods-get');
+  //
+  // // Путь к файлу
+  // const directoryPath = path.join(__dirname, 'public'); // Примерный путь к папке, где должен быть сохранен файл
+  // const directoryPath2 = path.join(__dirname, 'public'); // Примерный путь к папке, где должен быть сохранен файл
+  // const filePath = path.join(directoryPath, 'goodsData.txt');
+  // const filePath2 = path.join(directoryPath2, 'groupsData.txt');
+  // const filePath3 = path.join(directoryPath2, 'priceData.txt');
+  //
+  // // Создаем отсутствующие папки, если они не существуют
+  // fs.mkdirSync(directoryPath, { recursive: true });
+  //
+  // // Сохраняем данные в текстовый файл
+  // fs.writeFileSync(filePath, JSON.stringify(goodsData.result.goods, null, 2), 'utf-8');
+  // fs.writeFileSync(filePath2, JSON.stringify(goodsData.result.goodsGroups, null, 2), 'utf-8');
+  // fs.writeFileSync(filePath3, JSON.stringify(responsePrice.result.goods, null, 2), 'utf-8');
+  // /////////////////////////////////////////////////////////////////////
+
   const products: IProductFromApi[] = responseProducts.result.goods;
   const quantity = responseQuantity.result;
   const quantityGoods: IProductQuantityFromApi[] = quantity.goods;
@@ -515,6 +549,52 @@ const run = async () => {
   await createProducts(products, price, priceName, quantityGoods, quantityStocks, categories);
   await createCategories(categories);
   await cleanUpDatabase();
+
+  // //////////////////////////
+  // // Функция для поиска товаров, которые не принадлежат ни одной категории
+  // const findProductsNotInCategories = async (products: IProductFromApi[], categories: ICategoryFromApi[]) => {
+  //   const categoryIds = categories.map((category) => category.ID);
+  //   const noProducts = products.filter((product) => !categoryIds.includes(product.ownerID));
+  //   console.log(noProducts.length);
+  //   return products.filter((product) => !categoryIds.includes(product.ownerID));
+  // };
+  //
+  // const saveProductsToFile = (
+  //   products: Array<{
+  //     name: string;
+  //     article: string;
+  //     goodID: string;
+  //     ownerID: string;
+  //   }>,
+  //   filePath: string,
+  // ) => {
+  //   const filteredProducts = products.map((product) => ({
+  //     name: product.name,
+  //     article: product.article,
+  //     goodID: product.goodID,
+  //     ownerID: product.ownerID,
+  //   }));
+  //
+  //   const jsonContent = JSON.stringify(filteredProducts, null, 2);
+  //
+  //   fs.writeFile(filePath, jsonContent, 'utf8', (err) => {
+  //     if (err) {
+  //       console.error('Ошибка при записи в файл:', err);
+  //       return;
+  //     }
+  //     console.log('Товары успешно сохранены в файл:', filePath);
+  //   });
+  // };
+  //
+  // findProductsNotInCategories(products, categories)
+  //   .then((filteredProducts) => {
+  //     const filePath = 'productsNotInCategories.json';
+  //     saveProductsToFile(filteredProducts, filePath);
+  //   })
+  //   .catch((error) => {
+  //     console.error('Ошибка:', error);
+  //   });
+  // //////////////////////////
 
   console.log('loading --- TRUE ! ! ! ');
 

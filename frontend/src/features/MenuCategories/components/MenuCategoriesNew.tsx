@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { selectCategories } from '../menuCategoriesSlice';
-import { fetchCategories } from '../menuCategoriesThunks';
+import { selectCategories, selectCategoriesImage } from '../menuCategoriesSlice';
+import { categoriesImageFetch, fetchCategories } from '../menuCategoriesThunks';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Container, Typography } from '@mui/material';
+import { apiURL } from '../../../constants';
+import { useNavigate } from 'react-router-dom';
 
 interface Category {
   _id: string;
@@ -13,15 +15,37 @@ interface Category {
   productsHave: boolean;
 }
 
-const MenuCategoriesNew: React.FC = () => {
+interface Props {
+  close: () => void;
+}
+
+const MenuCategoriesNew: React.FC<Props> = ({ close }) => {
   const [firstLevelCategories, setFirstLevelCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+  const [hoveredCategoryID, setHoveredCategoryID] = useState<string | null>(null);
+
   const categories = useAppSelector(selectCategories);
+  const categoriesImage = useAppSelector(selectCategoriesImage);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (firstLevelCategories.length > 0) {
+      const thirdLevelCategories = categories.filter((category) =>
+        firstLevelCategories.some((firstLevel) => firstLevel.ID === category.ownerID),
+      );
+
+      const thirdLevelCategoryIDs = thirdLevelCategories.map((category) => category.ID);
+
+      if (thirdLevelCategoryIDs.length > 0) {
+        dispatch(categoriesImageFetch(thirdLevelCategoryIDs));
+      }
+    }
+  }, [firstLevelCategories, categories, dispatch]);
 
   useEffect(() => {
     const rootCategory = categories.find((category) => !category.ownerID);
@@ -51,6 +75,7 @@ const MenuCategoriesNew: React.FC = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [activeCategory]);
 
+  // Получение списка категорий 3-го уровня
   const getThirdLevelCategories = (parentID: string) => {
     const thirdLevelCategories = categories.filter((category) => category.ownerID === parentID);
     if (thirdLevelCategories.length === 0) return null;
@@ -63,14 +88,28 @@ const MenuCategoriesNew: React.FC = () => {
           mb: 1,
           color: activeCategory?.ID === category.ID ? '#ddbe86' : 'rgb(0,0,0)',
           '&:hover': { color: '#ddbe86' },
-          fontSize: '12px',
+          fontSize: '14px',
           textTransform: 'uppercase',
         }}
-        onClick={() => handleCategoryClick(category)}
+        onClick={() => {
+          navigate('products/' + category.ID);
+          handleCategoryClick(category);
+          setActiveCategory(null); // Закрываем меню при выборе категории 3-го уровня
+          close();
+        }}
+        onMouseEnter={() => setHoveredCategoryID(category.ID)}
+        onMouseLeave={() => setHoveredCategoryID(null)}
       >
         {category.name}
       </Typography>
     ));
+  };
+
+  // Функция получения картинки категории
+  const getCategoryImg = (id: string | null) => {
+    if (!id) return null;
+    const categoryImage = categoriesImage.find((item) => item.ID === id);
+    return categoryImage?.images?.length ? categoryImage.images[0] : null;
   };
 
   return (
@@ -124,17 +163,34 @@ const MenuCategoriesNew: React.FC = () => {
                   zIndex: 1102,
                   display: 'flex',
                   justifyContent: 'space-between',
+                  height: '550px', // Фиксированная высота для предотвращения изменения размера
                 }}
               >
-                <Box sx={{ padding: '10px' }}>{getThirdLevelCategories(category.ID)}</Box>
+                <Box sx={{ padding: '20px' }}>{getThirdLevelCategories(category.ID)}</Box>
 
-                {/* Картинка справа */}
-                <Box sx={{ width: '70%' }}>
-                  <img
-                    src="https://ortgraph.ru/upload/medialibrary/e29/e290d6e38a4ab2b063d19fafdb48ef7a.jpg"
-                    alt="Category"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
+                {/* Картинка справа при наведении */}
+                <Box
+                  sx={{
+                    width: '70%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#f9f9f9', // Фон, если картинка маленькая
+                  }}
+                >
+                  {hoveredCategoryID && getCategoryImg(hoveredCategoryID) ? (
+                    <img
+                      src={`${apiURL}/${getCategoryImg(hoveredCategoryID)}`}
+                      alt="Category"
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    />
+                  ) : (
+                    <img
+                      src="https://ortgraph.ru/upload/medialibrary/e29/e290d6e38a4ab2b063d19fafdb48ef7a.jpg"
+                      alt="Category"
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    />
+                  )}
                 </Box>
               </Box>
             )}

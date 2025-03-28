@@ -129,7 +129,7 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
       {/* Каталог */}
       {catalogOpen && (
         <CatalogDropdown ref={catalogRef}>
-          <MenuCategoriesNew />
+          <MenuCategoriesNew close={() => setCatalogOpen(false)} />
         </CatalogDropdown>
       )}
     </NavigateTopWrapper>

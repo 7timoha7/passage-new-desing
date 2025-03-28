@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import type { CategoriesType } from '../../types';
-import { fetchCategories, fetchOneCategories } from './menuCategoriesThunks';
+import type { CategoriesType, CategoryImageType } from '../../types';
+import { categoriesImageFetch, fetchCategories, fetchOneCategories } from './menuCategoriesThunks';
 
 interface CategoriesState {
   categories: CategoriesType[];
@@ -9,6 +9,7 @@ interface CategoriesState {
   fetchAllCategoriesLoading: boolean;
   fetchOneCategoriesLoading: boolean;
   error: boolean;
+  categoriesImage: CategoryImageType[];
 }
 
 const initialState: CategoriesState = {
@@ -17,6 +18,7 @@ const initialState: CategoriesState = {
   error: false,
   fetchAllCategoriesLoading: false,
   fetchOneCategoriesLoading: false,
+  categoriesImage: [],
 };
 
 export const categoriesSlice = createSlice({
@@ -45,6 +47,17 @@ export const categoriesSlice = createSlice({
     builder.addCase(fetchOneCategories.rejected, (state) => {
       state.fetchOneCategoriesLoading = false;
     });
+
+    builder.addCase(categoriesImageFetch.pending, (state) => {
+      state.fetchAllCategoriesLoading = true;
+    });
+    builder.addCase(categoriesImageFetch.fulfilled, (state, action) => {
+      state.categoriesImage = action.payload;
+      state.fetchAllCategoriesLoading = false;
+    });
+    builder.addCase(categoriesImageFetch.rejected, (state) => {
+      state.fetchAllCategoriesLoading = false;
+    });
   },
 });
 export const categoriesReducer = categoriesSlice.reducer;
@@ -53,3 +66,4 @@ export const selectFetchAllCategoriesLoading = (state: RootState) => state.categ
 export const selectFetchOneCategoriesLoading = (state: RootState) => state.categories.fetchOneCategoriesLoading;
 export const selectCategories = (state: RootState) => state.categories.categories;
 export const selectCategory = (state: RootState) => state.categories.category;
+export const selectCategoriesImage = (state: RootState) => state.categories.categoriesImage;
