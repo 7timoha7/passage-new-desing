@@ -33,7 +33,6 @@ interface ProductsState {
   searchLoadingPreview: boolean;
   productsNews: ProductType[];
   productsNewsLoading: boolean;
-  productsNewsPageInfo: PageInfo | null;
 }
 
 const initialState: ProductsState = {
@@ -57,7 +56,6 @@ const initialState: ProductsState = {
   searchLoadingPreview: false,
   productsNews: [],
   productsNewsLoading: false,
-  productsNewsPageInfo: null,
 };
 
 export const productsSLice = createSlice({
@@ -84,7 +82,6 @@ export const productsSLice = createSlice({
     builder.addCase(productsFetchNews.fulfilled, (state, action) => {
       state.productsNewsLoading = false;
       state.productsNews = action.payload.products;
-      state.productsNewsPageInfo = action.payload.pageInfo;
     });
     builder.addCase(productsFetchNews.rejected, (state) => {
       state.productsNewsLoading = false;
@@ -201,7 +198,5 @@ export const selectSearchLoading = (state: RootState) => state.products.searchLo
 export const selectPageInfoSearch = (state: RootState) => state.products.pageInfoSearch;
 export const selectSearchResultsPreview = (state: RootState) => state.products.searchResultsPreview;
 export const selectSearchLoadingPreview = (state: RootState) => state.products.searchLoadingPreview;
-
 export const selectProductsNews = (state: RootState) => state.products.productsNews;
 export const selectProductsNewsLoading = (state: RootState) => state.products.productsNewsLoading;
-export const selectProductsNewsPageInfo = (state: RootState) => state.products.productsNewsPageInfo;

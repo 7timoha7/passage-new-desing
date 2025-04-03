@@ -2,7 +2,7 @@ import React from 'react';
 import { Backdrop, CircularProgress, Grid, Paper } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { selectProductsFromApiLoading } from '../../Products/productsSlise';
+import { selectProductsFromApiLoading } from '../../Products/productsSlice';
 import { productsFromApi } from '../../Products/productsThunks';
 import { fetchCategories } from '../../MenuCategories/menuCategoriesThunks';
 import { btnColorUpdateBase } from '../../../styles';

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { selectProductLoading, selectProductOne } from '../productsSlise';
+import { selectProductLoading, selectProductOne } from '../productsSlice';
 import { productFetch } from '../productsThunks';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import ProductFullCard from './ProductFullCard';

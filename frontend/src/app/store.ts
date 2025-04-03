@@ -4,7 +4,7 @@ import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist
 import storage from 'redux-persist/lib/storage';
 import { usersReducer } from '../features/users/usersSlice';
 import { categoriesReducer } from '../features/MenuCategories/menuCategoriesSlice';
-import { productsReducer } from '../features/Products/productsSlise';
+import { productsReducer } from '../features/Products/productsSlice';
 import { basketReducer } from '../features/Basket/basketSlice';
 import { ordersReducer } from '../features/Order/orderSlice';
 import { bestsellersReducer } from '../features/Bestsellers/bestsellersSlice';
@@ -12,6 +12,7 @@ import { bannersReducer } from '../features/Banners/bannersSlice';
 import { productsForReducer } from '../features/ProductsFor/productsForSlice';
 import { designerReducer } from '../components/UI/AppToolbar/NavigateTop/Components/ForClients/ForUsers/Designers/designersSlice';
 import { discountsReducer } from '../features/GetADiscount/discountsSlice';
+import { productsSaleReducer } from '../features/ProductsSale/ProductsSaleSlice';
 
 const usersPersistConfig = {
   key: 'passage:users',
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   banners: persistReducer(usersPersistConfig, bannersReducer),
   designer: persistReducer(usersPersistConfig, designerReducer),
   discounts: persistReducer(usersPersistConfig, discountsReducer),
+  productsSale: persistReducer(usersPersistConfig, productsSaleReducer),
 });
 
 export const store = configureStore({

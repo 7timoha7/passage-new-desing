@@ -13,7 +13,7 @@ import {
   clearSearchResultsPreview,
   selectSearchLoadingPreview,
   selectSearchResultsPreview,
-} from '../../../../../features/Products/productsSlise';
+} from '../../../../../features/Products/productsSlice';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 

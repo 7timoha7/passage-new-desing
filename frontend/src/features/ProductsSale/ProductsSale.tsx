@@ -1,33 +1,31 @@
 import React, { useEffect, useRef } from 'react';
-import Slider, { Settings } from 'react-slick';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectBestsellers, selectFetchBestsellersLoading } from './bestsellersSlice';
-import { fetchBestsellers } from './bestsellersThunks';
-import ProductCard from '../Products/components/ProductCard';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
+import Slider, { Settings } from 'react-slick';
+import { selectBasket } from '../Basket/basketSlice';
+import { ProductType } from '../../types';
 import { Box, Grid } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { ProductType } from '../../types';
-import { selectBasket } from '../Basket/basketSlice';
 import Spinner from '../../components/UI/Spinner/Spinner';
+import ProductCard from '../Products/components/ProductCard';
+import { fetchProductsSale } from './ProductsSaleThunks';
+import { selectFetchProductsSaleLoading, selectProductsSale } from './ProductsSaleSlice';
 
-const Bestsellers: React.FC = () => {
-  const bestsellersProduct = useAppSelector(selectBestsellers);
+const ProductsSale = () => {
   const dispatch = useAppDispatch();
   const sliderRef = useRef<Slider>(null);
   const basket = useAppSelector(selectBasket);
-  const loadingBestsellers = useAppSelector(selectFetchBestsellersLoading);
+  const productsSale = useAppSelector(selectProductsSale);
+  const loadingProductsSale = useAppSelector(selectFetchProductsSaleLoading);
 
   useEffect(() => {
-    dispatch(fetchBestsellers());
+    dispatch(fetchProductsSale());
   }, [dispatch]);
 
   // Проверьте, что bestsellersProduct - это массив
-  if (!Array.isArray(bestsellersProduct)) {
+  if (!Array.isArray(productsSale)) {
     // Обработайте случай, когда bestsellersProduct не является массивом
     return null;
   }
@@ -50,8 +48,8 @@ const Bestsellers: React.FC = () => {
     focusOnSelect: true, // Слайд будет центрироваться при клике
     draggable: true, // Включает/отключает перетаскивание слайдов мышью (для десктопа)
     responsive: [
-      { breakpoint: 3000, settings: { variableWidth: false, slidesToShow: 5, centerMode: false } },
-      { breakpoint: 1800, settings: { variableWidth: false, slidesToShow: 5, centerMode: false } },
+      { breakpoint: 3000, settings: { variableWidth: false, slidesToShow: 4, centerMode: false } },
+      { breakpoint: 1800, settings: { variableWidth: false, slidesToShow: 4, centerMode: false } },
       { breakpoint: 1420, settings: { variableWidth: false, slidesToShow: 4, centerMode: false } },
       { breakpoint: 1300, settings: { variableWidth: false, slidesToShow: 3, centerMode: false } },
       { breakpoint: 1080, settings: { variableWidth: false, slidesToShow: 2, centerMode: false } },
@@ -79,10 +77,9 @@ const Bestsellers: React.FC = () => {
       return false;
     }
   };
-
   return (
     <>
-      {bestsellersProduct.length < 1 ? null : (
+      {productsSale.length < 1 ? null : (
         <div
           style={{
             // border: ProductsNewsBorderStyles,
@@ -113,7 +110,7 @@ const Bestsellers: React.FC = () => {
           </style>
 
           <Grid container justifyContent={'space-between'} alignItems={'center'} sx={{ mb: 3 }}>
-            <Typography variant="h4">ПОПУЛЯРНЫЕ ТОВАРЫ</Typography>
+            <Typography variant="h4">РАСПРОДАЖА</Typography>
             <Grid item></Grid>
             <Grid item>
               <Grid container spacing={2}>
@@ -146,17 +143,17 @@ const Bestsellers: React.FC = () => {
               </Grid>
             </Grid>
           </Grid>
-          {loadingBestsellers ? (
+          {loadingProductsSale ? (
             <Spinner />
           ) : (
             <>
-              {bestsellersProduct.length < 2 ? (
+              {productsSale.length < 2 ? (
                 <Box sx={{ p: 2 }}>
-                  <ProductCard indicator={indicator(bestsellersProduct[0])} product={bestsellersProduct[0]} />
+                  <ProductCard indicator={indicator(productsSale[0])} product={productsSale[0]} />
                 </Box>
               ) : (
                 <Slider ref={sliderRef} {...sliderSettings}>
-                  {bestsellersProduct.map((item) => (
+                  {productsSale.map((item) => (
                     <ProductCard indicator={indicator(item)} product={item} key={item._id} />
                   ))}
                 </Slider>
@@ -169,4 +166,4 @@ const Bestsellers: React.FC = () => {
   );
 };
 
-export default Bestsellers;
+export default ProductsSale;

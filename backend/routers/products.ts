@@ -89,42 +89,105 @@ productRouter.get('/', async (req, res) => {
   }
 });
 
+// productRouter.get('/news', async (req, res) => {
+//   try {
+//     const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+//     const pageSize = 20;
+//     const totalProducts = await Product.countDocuments();
+//     const totalPages = Math.ceil(totalProducts / pageSize);
+//
+//     let products;
+//
+//     if (page <= 2) {
+//       // Получаем первые 40 продуктов
+//       const first40Products = await Product.find().limit(40);
+//       // Определяем диапазон для текущей страницы
+//       const startIndex = (page - 1) * pageSize;
+//       const endIndex = startIndex + pageSize;
+//       // Рандомно перемешиваем первые 40 продуктов
+//       const shuffledProducts = first40Products.sort(() => Math.random() - 0.5);
+//       // Берем нужный диапазон продуктов для текущей страницы
+//       products = shuffledProducts.slice(startIndex, endIndex);
+//     } else {
+//       // Для всех остальных страниц
+//       products = await Product.find()
+//         .sort({ article: -1 }) // Сортируем по убыванию значения поля article
+//         .skip((page - 1) * pageSize)
+//         .limit(pageSize);
+//     }
+//
+//     return res.send({
+//       products,
+//       pageInfo: {
+//         currentPage: page,
+//         totalPages,
+//         pageSize,
+//         totalItems: totalProducts,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.sendStatus(500);
+//   }
+// });
+
 productRouter.get('/news', async (req, res) => {
   try {
-    const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
-    const pageSize = 20;
-    const totalProducts = await Product.countDocuments();
-    const totalPages = Math.ceil(totalProducts / pageSize);
+    // Получаем последние 50 товаров, сортируя по убыванию article
+    const last50Products = await Product.find()
+      .sort({ article: -1 }) // Сортируем по убыванию article
+      .limit(50); // Берем 50 последних товаров
 
-    let products;
+    // Перемешиваем их случайным образом
+    const shuffledProducts = last50Products.sort(() => Math.random() - 0.5);
 
-    if (page <= 2) {
-      // Получаем первые 40 продуктов
-      const first40Products = await Product.find().limit(40);
-      // Определяем диапазон для текущей страницы
-      const startIndex = (page - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      // Рандомно перемешиваем первые 40 продуктов
-      const shuffledProducts = first40Products.sort(() => Math.random() - 0.5);
-      // Берем нужный диапазон продуктов для текущей страницы
-      products = shuffledProducts.slice(startIndex, endIndex);
-    } else {
-      // Для всех остальных страниц
-      products = await Product.find()
-        .sort({ article: -1 }) // Сортируем по убыванию значения поля article
-        .skip((page - 1) * pageSize)
-        .limit(pageSize);
+    // Берем первые 10 после перемешивания
+    const selectedProducts = shuffledProducts.slice(0, 10);
+
+    return res.send({ products: selectedProducts });
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+productRouter.get('/productsSale', async (req, res) => {
+  try {
+    // 1. Находим категорию "РАСПРОДАЖА"
+    const saleCategory = await Category.findOne({ name: 'РАСПРОДАЖА' });
+
+    if (!saleCategory) {
+      return res.status(404).json({ message: "Категория 'РАСПРОДАЖА' не найдена" });
     }
 
-    return res.send({
-      products,
-      pageInfo: {
-        currentPage: page,
-        totalPages,
-        pageSize,
-        totalItems: totalProducts,
-      },
-    });
+    // 2. Функция для поиска всех вложенных категорий (по ownerID)
+    const getAllSubcategories = async (parentID: string): Promise<string[]> => {
+      const subcategories = await Category.find({ ownerID: parentID });
+      let allCategories = subcategories.map((cat) => cat.ID);
+
+      for (const subcat of subcategories) {
+        const nestedCategories = await getAllSubcategories(subcat.ID);
+        allCategories = allCategories.concat(nestedCategories);
+      }
+
+      return allCategories;
+    };
+
+    // 3. Получаем все вложенные категории
+    const categoryIDs = await getAllSubcategories(saleCategory.ID);
+    categoryIDs.push(saleCategory.ID); // Добавляем саму "РАСПРОДАЖА"
+
+    // 4. Ищем товары, у которых ownerID соответствует этим категориям
+    const products = await Product.find({ ownerID: { $in: categoryIDs } });
+
+    if (products.length === 0) {
+      return res.status(404).json({ message: "Нет товаров в категории 'РАСПРОДАЖА'" });
+    }
+
+    // 5. Перемешиваем товары и берем 15 случайных
+    const shuffledProducts = products.sort(() => Math.random() - 0.5).slice(0, 15);
+
+    return res.send(shuffledProducts);
   } catch (error) {
     console.error(error);
     return res.sendStatus(500);

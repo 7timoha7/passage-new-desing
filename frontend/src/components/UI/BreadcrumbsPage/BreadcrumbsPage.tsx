@@ -3,7 +3,7 @@ import { Box, Breadcrumbs, Link } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../../app/hooks';
 import { selectCategories } from '../../../features/MenuCategories/menuCategoriesSlice';
-import { selectProductOne } from '../../../features/Products/productsSlise';
+import { selectProductOne } from '../../../features/Products/productsSlice';
 
 const BreadcrumbsPage = () => {
   const location = useLocation();

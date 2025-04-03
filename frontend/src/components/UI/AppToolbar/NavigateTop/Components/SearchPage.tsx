@@ -8,7 +8,7 @@ import {
   selectPageInfoSearch,
   selectSearchLoading,
   selectSearchResults,
-} from '../../../../../features/Products/productsSlise';
+} from '../../../../../features/Products/productsSlice';
 import { selectBasket } from '../../../../../features/Basket/basketSlice';
 import { searchProductsFull } from '../../../../../features/Products/productsThunks';
 import ProductCard from '../../../../../features/Products/components/ProductCard';

@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import ProductCard from './ProductCard';
 import { selectBasket } from '../../Basket/basketSlice';
 import { productsFetch } from '../productsThunks';
-import { selectPageInfo, selectProductsState } from '../productsSlise';
+import { selectPageInfo, selectProductsState } from '../productsSlice';
 import { themeBlackSelect } from '../../../theme';
 
 interface Props {

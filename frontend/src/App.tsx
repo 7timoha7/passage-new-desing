@@ -32,12 +32,11 @@ import {
   selectProductSuccess,
   setProductFromApiSuccessNull,
   setProductSuccessNull,
-} from './features/Products/productsSlise';
+} from './features/Products/productsSlice';
 import { selectBasketSuccess, setBasketSuccessNull } from './features/Basket/basketSlice';
 import SearchPage from './components/UI/AppToolbar/NavigateTop/Components/SearchPage';
 import { selectOrderSuccess, setOrderSuccessNull } from './features/Order/orderSlice';
 import { selectBestsellerSuccess } from './features/Bestsellers/bestsellersSlice';
-import ProductsNews from './features/Products/components/ProductsNews';
 import Delivery from './components/UI/AppToolbar/NavigateTop/Components/ForClients/ForUsers/Delivery/Delivery';
 import BasketPage from './features/Basket/BasketPage';
 import Installment from './components/UI/AppToolbar/NavigateTop/Components/ForClients/ForUsers/Installment/Installment';
@@ -261,7 +260,6 @@ function App() {
         <Route path="/about/" element={<AboutPage />} />
         <Route path="/contacts/" element={<ContactsPage />} />
         <Route path="/search-results/:text" element={<SearchPage />} />
-        <Route path="/productsNews/" element={<ProductsNews />} />
         <Route path="/delivery/" element={<Delivery />} />
         <Route path="/installment/" element={<Installment />} />
         <Route path="/warranty/" element={<Warranty />} />

@@ -16,6 +16,7 @@ import BannerTop from '../../../features/Banners/BannerTop';
 import BannersMiddle from '../../../features/Banners/BannersMiddle';
 import BannersBottom from '../../../features/Banners/BannersBottom';
 import CategoriesMainPage from '../../../features/MenuCategories/components/CategoriesMainPage';
+import ProductsSale from '../../../features/ProductsSale/ProductsSale';
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const isMobile = useMediaQuery('(max-width:1200px)');
@@ -87,10 +88,6 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
         </Box>
       </Container>
 
-      <Container maxWidth="xl" sx={{ mb: 2 }}>
-        {location.pathname === '/' && <Bestsellers />}
-      </Container>
-
       {location.pathname === '/' && (
         <Container maxWidth="xl" sx={{ mb: 2 }}>
           <CategoriesMainPage />
@@ -100,6 +97,14 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <Container maxWidth="xl" sx={{ mb: 2 }}>
         {location.pathname.includes('/product/') && productsForID && <ProductsFor categoriesID={productsForID} />}
         {location.pathname === '/' && <ProductsNews />}
+      </Container>
+
+      <Container maxWidth="xl" sx={{ mb: 2 }}>
+        {location.pathname === '/' && <ProductsSale />}
+      </Container>
+
+      <Container maxWidth="xl" sx={{ mb: 2 }}>
+        {location.pathname === '/' && <Bestsellers />}
       </Container>
 
       {/* Футер */}

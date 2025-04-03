@@ -5,7 +5,7 @@ import {
   selectFavoriteProducts,
   selectFetchFavoriteProductsLoading,
   selectPageInfo,
-} from '../../Products/productsSlise';
+} from '../../Products/productsSlice';
 import { getFavoriteProducts } from '../../Products/productsThunks';
 import { selectBasket } from '../../Basket/basketSlice';
 import Typography from '@mui/material/Typography';

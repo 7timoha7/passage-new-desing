@@ -16,7 +16,7 @@ import { getFavoriteProducts } from '../productsThunks';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { fetchBasket, updateBasket } from '../../Basket/basketThunks';
-import { selectPageInfo } from '../productsSlise';
+import { selectPageInfo } from '../productsSlice';
 import { selectBasketUpdateLoading } from '../../Basket/basketSlice';
 import { CircularProgress } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
