@@ -23,8 +23,17 @@ export const fetchOneCategories = createAsyncThunk<CategoriesType, string>('cate
 export const categoriesImageFetch = createAsyncThunk<CategoryImageType[], string[]>(
   'categories/categoriesImage',
   async (ids) => {
-    console.log('Отправляем POST-запрос с ID:', ids);
+    const response = await axiosApi.post<CategoryImageType[]>('/categories/random-images', {
+      categoryIDs: ids, // Передаем массив в body
+    });
 
+    return response.data;
+  },
+);
+
+export const categoriesImageFetchMain = createAsyncThunk<CategoryImageType[], string[]>(
+  'categories/categoriesImageMain',
+  async (ids) => {
     const response = await axiosApi.post<CategoryImageType[]>('/categories/random-images', {
       categoryIDs: ids, // Передаем массив в body
     });

@@ -186,4 +186,49 @@ export const themeDiscount = createTheme({
   },
 });
 
+export const themeBlackSelect = createTheme({
+  components: {
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          color: '#000000', // Черная иконка стрелки
+        },
+        select: {
+          color: '#000000', // Черный текст в селекте
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          color: '#000000', // Черный текст в выпадающем списке
+        },
+      },
+    },
+    MuiFormControl: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputLabel-root': {
+            color: '#000000', // Черный цвет лейбла
+          },
+          '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
+            color: '#000000 !important', // Черный цвет лейбла при сжатии
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: '#000000', // Черная рамка
+            },
+            '&:hover fieldset': {
+              borderColor: '#000000', // Черная рамка при наведении
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#000000', // Черная рамка при фокусе
+            },
+          },
+        },
+      },
+    },
+  },
+});
+
 export default theme;

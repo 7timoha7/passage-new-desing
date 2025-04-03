@@ -13,7 +13,7 @@ main {
 body {
   margin: 0;
   padding: 0;
-  background-image: url('../src/assets/images/newFon/17.jpeg');
+  /*background-image: url('../src/assets/images/newFon/17.jpeg');*/
   background-repeat: repeat;
   font-family: 'Inter', sans-serif;
 }

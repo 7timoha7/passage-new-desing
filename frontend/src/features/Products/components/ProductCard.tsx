@@ -132,7 +132,7 @@ const ProductCard: React.FC<Props> = ({ product, indicator }) => {
       onClick={() => onClickCard()}
       sx={{
         height: '100%',
-        width: 300,
+        width: 260,
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
@@ -158,7 +158,7 @@ const ProductCard: React.FC<Props> = ({ product, indicator }) => {
         effect="blur" // можно изменить на 'opacity' или другой
         src={imgProduct}
         alt="Product"
-        height={200}
+        height={250}
         width="100%"
         placeholderSrc={placeHolderImg}
         style={{ objectFit: 'contain' }}

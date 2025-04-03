@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Box, Container, Divider, Grid, Link, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Box, Container, Grid, Link, Typography, useMediaQuery } from '@mui/material';
 import CallIcon from '@mui/icons-material/Call';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import FacebookIcon from '@mui/icons-material/Facebook';
@@ -25,7 +25,7 @@ const Footer = () => {
             {!isMobile ? (
               <Grid item>
                 <Link href={'/'}>
-                  <img style={{ maxWidth: '300px' }} src="/logo_footer.png" alt="passage" />
+                  <img style={{ maxWidth: '300px' }} src="/logo_brown_black.png" alt="passage" />
                 </Link>
               </Grid>
             ) : null}
@@ -44,7 +44,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       '&:hover': { color: '#ad882c' },
@@ -62,7 +62,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       '&:hover': { color: '#ad882c' },
@@ -80,7 +80,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       '&:hover': { color: '#ad882c' },
@@ -98,7 +98,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       '&:hover': { color: '#ad882c' },
@@ -122,7 +122,7 @@ const Footer = () => {
                     variant="body1"
                     component="div"
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -136,7 +136,7 @@ const Footer = () => {
                     variant="body1"
                     component="div"
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -161,7 +161,7 @@ const Footer = () => {
                     underline="none"
                     onClick={() => handlePhoneClick('+996997100500')}
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       cursor: 'pointer',
@@ -179,7 +179,7 @@ const Footer = () => {
                     underline="none"
                     onClick={() => handlePhoneClick('+996553100500')}
                     sx={{
-                      color: '#000000',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       cursor: 'pointer',
@@ -193,23 +193,23 @@ const Footer = () => {
               </Grid>
             </Grid>
           </Grid>
-          <Divider sx={{ border: '1px solid #3f3f3f', position: 'absolute', left: 0, right: 0 }} />
+          {/*<Divider sx={{ border: '1px solid #3f3f3f', position: 'absolute', left: 0, right: 0 }} />*/}
 
-          <Typography sx={{ pt: 1, textAlign: 'center', fontSize: '12px' }}>
-            <Link
-              sx={{
-                textDecoration: 'none',
-                color: '#000000',
-                '&:hover': { color: '#ad882c' },
-              }}
-              href="https://summary-topaz.vercel.app/"
-              color="inherit"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Разработчик проекта: Маркелов Артем
-            </Link>
-          </Typography>
+          {/*<Typography sx={{ pt: 1, textAlign: 'center', fontSize: '12px' }}>*/}
+          {/*  <Link*/}
+          {/*    sx={{*/}
+          {/*      textDecoration: 'none',*/}
+          {/*      color: '#FFFFFF',*/}
+          {/*      '&:hover': { color: '#ad882c' },*/}
+          {/*    }}*/}
+          {/*    href="https://summary-topaz.vercel.app/"*/}
+          {/*    color="inherit"*/}
+          {/*    target="_blank"*/}
+          {/*    rel="noopener noreferrer"*/}
+          {/*  >*/}
+          {/*    Разработчик проекта: Маркелов Артем*/}
+          {/*  </Link>*/}
+          {/*</Typography>*/}
         </Container>
       </AppBar>
     </Box>

@@ -33,8 +33,9 @@ export const ToolBarMobileStyles = {
 
 export const FooterStyle = {
   // background: 'linear-gradient(45deg, hsla(210, 100%, 88%, 1) 0%, hsla(210, 79%, 46%, 1) 100%)',
-  backgroundImage: `url(${img1})`,
-  backgroundSize: 'repeat',
+  // backgroundImage: `url(${img1})`,
+  // backgroundSize: 'repeat',
+  background: '#1D1D1D',
   boxShadow: '0px -2px 4px -1px rgba(0,0,0,0.2), 0px -4px 5px 0px rgba(0,0,0,0.14), 0px -1px 10px 0px rgba(0,0,0,0.12)',
 };
 

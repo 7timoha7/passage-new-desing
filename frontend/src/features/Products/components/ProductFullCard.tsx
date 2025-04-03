@@ -26,7 +26,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { changeFavorites, reAuthorization } from '../../users/usersThunks';
 import { getFavoriteProducts } from '../productsThunks';
-import Card from '@mui/material/Card';
 import { LoadingButton } from '@mui/lab';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
@@ -109,7 +108,7 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Paper elevation={3} sx={{ maxWidth: '100%', margin: 'auto', position: 'relative', padding: '16px' }}>
+      <Box sx={{ maxWidth: '100%', margin: 'auto', position: 'relative' }}>
         <Box
           sx={{
             position: 'absolute',
@@ -137,9 +136,18 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
               <FavoriteBorderIcon />
             ))}
         </Box>
-        <Grid container>
-          <Grid item sx={{ width: '100%', mb: 3, display: 'flex', justifyContent: 'center' }}>
-            <Card sx={{ p: 2, width: '100%' }}>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '40% 60%' }, // 40% картинка, 60% инфа
+            gap: 2,
+          }}
+        >
+          {/* Левая часть - изображение */}
+          <Grid item>
+            <Box>
               {product.images.length ? (
                 <ProductGallery images={product.images} />
               ) : (
@@ -147,29 +155,33 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
                   src={noImage}
                   alt={product.name}
                   width="100%"
-                  height="600px"
+                  height="200px"
                   effect="blur"
                   placeholderSrc={placeHolderImg}
                   style={{ objectFit: 'contain' }}
                 />
               )}
-            </Card>
+            </Box>
           </Grid>
 
-          <Grid item>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                height: '100%',
-              }}
-            >
-              <Box sx={{ mt: 2, mb: 2 }}>
-                <Typography variant="h5" gutterBottom>
-                  {product.name}
-                </Typography>
+          {/* Правая часть - информация */}
+          <Grid
+            item
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {/* Описание */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="h4" gutterBottom>
+                {product.name}
+              </Typography>
+            </Box>
 
+            {/* Кнопки и цена*/}
+            <Box sx={{ background: 'rgba(245,245,245,0.73)', borderRadius: '10px', padding: '18px' }}>
+              <Box sx={{ mb: 2 }}>
                 {product.priceSale > 0 && (
                   <Box>
                     <Typography sx={{ color: priceColorFullCard, mt: 1, textDecoration: 'line-through' }}>
@@ -249,21 +261,20 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
                   ) : null}
                 </Box>
               </Box>
-              <Grid container spacing={2}>
+
+              <Grid container gap={2}>
                 <Grid item>
                   <Tooltip title={indicator(product) ? 'Товар уже в корзине' : 'Добавить в корзину'} arrow>
-                    <div>
-                      <LoadingButton
-                        onClick={handleAddToCart}
-                        disabled={indicator(product)}
-                        variant="outlined"
-                        endIcon={<AddShoppingCartIcon />}
-                        sx={btnFullCardColor}
-                        loading={addBasketLoading === product.goodID}
-                      >
-                        {indicator(product) ? 'В корзине' : 'Добавить в корзину'}
-                      </LoadingButton>
-                    </div>
+                    <LoadingButton
+                      onClick={handleAddToCart}
+                      disabled={indicator(product)}
+                      variant="outlined"
+                      endIcon={<AddShoppingCartIcon />}
+                      sx={btnFullCardColor}
+                      loading={addBasketLoading === product.goodID}
+                    >
+                      {indicator(product) ? 'В корзине' : 'Добавить в корзину'}
+                    </LoadingButton>
                   </Tooltip>
                 </Grid>
                 <Grid item>
@@ -273,104 +284,104 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
                 </Grid>
               </Grid>
             </Box>
+            <Box mt={4}>
+              <Typography variant="h6" gutterBottom>
+                Информация о товаре
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        Описание:
+                      </TableCell>
+                      <TableCell>{product.description}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        Единицы измерения:
+                      </TableCell>
+                      <TableCell>{product.measureName}</TableCell>
+                    </TableRow>
+                    {product.size && product.thickness && (
+                      <TableRow>
+                        <TableCell component="th" scope="row">
+                          Размер:
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography variant={'caption'}>Ширина/высота(см): {product.size}</Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant={'caption'}>Толщина(мм): {product.thickness}</Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    )}
+
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        Наличие:
+                      </TableCell>
+                      <TableCell>
+                        {user && (user.role === 'admin' || user.role === 'director') ? (
+                          <>
+                            {product.quantity.map((stock, index) => (
+                              <Box key={stock.stockID + index}>
+                                <Typography variant={'caption'}>
+                                  {stock.name}: <span style={{ fontWeight: 'bold' }}>{stock.quantity}</span>
+                                </Typography>
+                              </Box>
+                            ))}
+                          </>
+                        ) : (
+                          <Typography variant={'caption'} color={'green'}>
+                            В наличии
+                          </Typography>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    {product.originCountry && (
+                      <TableRow>
+                        <TableCell component="th" scope="row">
+                          Страна производитель:
+                        </TableCell>
+                        <TableCell>
+                          <Grid container spacing={2} alignItems={'center'}>
+                            <Grid item sx={{ mt: '3px' }}>
+                              {countryName && <Typography>{countryName}</Typography>}
+                            </Grid>
+                            <Grid item>
+                              {isoCountryCode && (
+                                <CountryFlag
+                                  countryCode={isoCountryCode}
+                                  svg
+                                  style={{
+                                    width: '100%',
+                                    maxWidth: '35px',
+                                    height: 'auto',
+                                    borderRadius: '3px',
+                                  }}
+                                />
+                              )}
+                            </Grid>
+                          </Grid>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        Артикул:
+                      </TableCell>
+                      <TableCell>{product.article}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
           </Grid>
         </Grid>
-        <Box mt={4}>
-          <Typography variant="h6" gutterBottom>
-            Информация о товаре
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableBody>
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    Описание:
-                  </TableCell>
-                  <TableCell>{product.description}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    Единицы измерения:
-                  </TableCell>
-                  <TableCell>{product.measureName}</TableCell>
-                </TableRow>
-                {product.size && product.thickness && (
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      Размер:
-                    </TableCell>
-                    <TableCell>
-                      <Box>
-                        <Typography variant={'caption'}>Ширина/высота(см): {product.size}</Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant={'caption'}>Толщина(мм): {product.thickness}</Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                )}
-
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    Наличие:
-                  </TableCell>
-                  <TableCell>
-                    {user && (user.role === 'admin' || user.role === 'director') ? (
-                      <>
-                        {product.quantity.map((stock, index) => (
-                          <Box key={stock.stockID + index}>
-                            <Typography variant={'caption'}>
-                              {stock.name}: <span style={{ fontWeight: 'bold' }}>{stock.quantity}</span>
-                            </Typography>
-                          </Box>
-                        ))}
-                      </>
-                    ) : (
-                      <Typography variant={'caption'} color={'green'}>
-                        В наличии
-                      </Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
-                {product.originCountry && (
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      Страна производитель:
-                    </TableCell>
-                    <TableCell>
-                      <Grid container spacing={2} alignItems={'center'}>
-                        <Grid item sx={{ mt: '3px' }}>
-                          {countryName && <Typography>{countryName}</Typography>}
-                        </Grid>
-                        <Grid item>
-                          {isoCountryCode && (
-                            <CountryFlag
-                              countryCode={isoCountryCode}
-                              svg
-                              style={{
-                                width: '100%',
-                                maxWidth: '35px',
-                                height: 'auto',
-                                borderRadius: '3px',
-                              }}
-                            />
-                          )}
-                        </Grid>
-                      </Grid>
-                    </TableCell>
-                  </TableRow>
-                )}
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    Артикул:
-                  </TableCell>
-                  <TableCell>{product.article}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      </Paper>
+      </Box>
     </Box>
   );
 };

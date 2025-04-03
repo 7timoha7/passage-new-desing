@@ -61,8 +61,6 @@ const getNestedCategories = async (categoryIDs: string[]): Promise<string[]> => 
 };
 
 categoryRouter.post('/random-images', async (req, res) => {
-  console.log('Запрос на бэк, req.body:', req.body);
-
   try {
     const { categoryIDs }: { categoryIDs: string[] } = req.body; // Явно указываем тип
 

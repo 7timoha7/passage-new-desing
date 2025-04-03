@@ -1,7 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import type { CategoriesType, CategoryImageType } from '../../types';
-import { categoriesImageFetch, fetchCategories, fetchOneCategories } from './menuCategoriesThunks';
+import {
+  categoriesImageFetch,
+  categoriesImageFetchMain,
+  fetchCategories,
+  fetchOneCategories,
+} from './menuCategoriesThunks';
 
 interface CategoriesState {
   categories: CategoriesType[];
@@ -10,6 +15,7 @@ interface CategoriesState {
   fetchOneCategoriesLoading: boolean;
   error: boolean;
   categoriesImage: CategoryImageType[];
+  categoriesImageMain: CategoryImageType[];
 }
 
 const initialState: CategoriesState = {
@@ -19,6 +25,7 @@ const initialState: CategoriesState = {
   fetchAllCategoriesLoading: false,
   fetchOneCategoriesLoading: false,
   categoriesImage: [],
+  categoriesImageMain: [],
 };
 
 export const categoriesSlice = createSlice({
@@ -58,6 +65,17 @@ export const categoriesSlice = createSlice({
     builder.addCase(categoriesImageFetch.rejected, (state) => {
       state.fetchAllCategoriesLoading = false;
     });
+
+    builder.addCase(categoriesImageFetchMain.pending, (state) => {
+      state.fetchAllCategoriesLoading = true;
+    });
+    builder.addCase(categoriesImageFetchMain.fulfilled, (state, action) => {
+      state.categoriesImageMain = action.payload;
+      state.fetchAllCategoriesLoading = false;
+    });
+    builder.addCase(categoriesImageFetchMain.rejected, (state) => {
+      state.fetchAllCategoriesLoading = false;
+    });
   },
 });
 export const categoriesReducer = categoriesSlice.reducer;
@@ -67,3 +85,4 @@ export const selectFetchOneCategoriesLoading = (state: RootState) => state.categ
 export const selectCategories = (state: RootState) => state.categories.categories;
 export const selectCategory = (state: RootState) => state.categories.category;
 export const selectCategoriesImage = (state: RootState) => state.categories.categoriesImage;
+export const selectCategoriesImageMain = (state: RootState) => state.categories.categoriesImageMain;

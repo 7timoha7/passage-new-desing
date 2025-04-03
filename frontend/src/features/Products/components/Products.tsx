@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Grid, Stack, useMediaQuery } from '@mui/material';
+import {
+  Box,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  ThemeProvider,
+  useMediaQuery,
+} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
 import { BasketTypeOnServerMutation, CategoriesType, ProductType } from '../../../types';
@@ -9,6 +20,7 @@ import ProductCard from './ProductCard';
 import { selectBasket } from '../../Basket/basketSlice';
 import { productsFetch } from '../productsThunks';
 import { selectPageInfo, selectProductsState } from '../productsSlise';
+import { themeBlackSelect } from '../../../theme';
 
 interface Props {
   categoryName: CategoriesType | null;
@@ -22,6 +34,7 @@ const Products: React.FC<Props> = ({ categoryName }) => {
   const productsInCategory = useAppSelector(selectProductsState);
   const basket = useAppSelector(selectBasket);
   const pageInfo = useAppSelector(selectPageInfo);
+  const [age, setAge] = useState<string>('');
 
   useEffect(() => {
     if (basket) {
@@ -37,6 +50,10 @@ const Products: React.FC<Props> = ({ categoryName }) => {
       setName(categoryName.name);
     }
   }, [categoryName, dispatch, id]);
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setAge(event.target.value as string);
+  };
 
   const indicator = (item: ProductType) => {
     if (stateBasket && item) {
@@ -76,15 +93,34 @@ const Products: React.FC<Props> = ({ categoryName }) => {
 
   return (
     <Box mt={2}>
-      <Box textAlign="center" mb={2}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }} mb={2}>
         <Typography variant="h4" fontWeight={'bold'} style={{ marginLeft: '2%' }}>
           {name}
         </Typography>
+
+        <Box sx={{ minWidth: 200 }}>
+          <ThemeProvider theme={themeBlackSelect}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="demo-simple-select-label">Сортировать по:</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={age}
+                label="Сортировать по:"
+                onChange={handleChange}
+              >
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+            </FormControl>
+          </ThemeProvider>
+        </Box>
       </Box>
 
       {renderPagination()}
 
-      <Grid container spacing={isSmallScreen ? 1.5 : 4} mt={2} mb={2} justifyContent={'center'}>
+      <Grid container spacing={isSmallScreen ? 1 : 2} mt={2} mb={2} justifyContent={'center'}>
         {productsInCategory.map((item) => (
           <Grid item key={item._id}>
             <ProductCard product={item} indicator={indicator(item)} />

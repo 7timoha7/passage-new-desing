@@ -1,0 +1,37 @@
+/* Products.css */
+
+.products-container {
+  margin-top: 2rem;
+}
+
+.title-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-weight: bold;
+  margin-left: 2%;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+}
+
+.grid-container {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.grid-item {
+  padding: 8px;
+}
+
+@media (max-width: 600px) {
+  .grid-container {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+}

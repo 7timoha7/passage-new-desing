@@ -3,6 +3,7 @@ import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/css/image-gallery.css';
 import { apiURL } from '../../../constants';
 import './BtnClose.css';
+import './ProductGallery.css';
 
 interface Props {
   images: string[];
@@ -12,10 +13,10 @@ const ProductGallery: React.FC<Props> = ({ images }) => {
   const galleryImages = images.map((image) => ({
     original: apiURL + '/' + image,
     thumbnail: apiURL + '/' + image,
-    originalHeight: 800,
+    originalHeight: 600,
     originalWidth: 600,
-    thumbnailMaxHeight: 150,
-    thumbnailMaxWidth: 100,
+    thumbnailHeight: 50, // Фиксированная высота миниатюры
+    thumbnailWidth: 50, // Фиксированная ширина миниатюры
   }));
 
   const handleScreenChange = (isFullScreen: boolean) => {
@@ -35,34 +36,30 @@ const ProductGallery: React.FC<Props> = ({ images }) => {
   const galleryRef = React.useRef<ImageGallery>(null);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <div style={{ maxWidth: '1200px' }}>
-        <ImageGallery
-          ref={galleryRef}
-          items={galleryImages}
-          onScreenChange={handleScreenChange}
-          onClick={() => galleryRef.current?.fullScreen()}
-          lazyLoad={true}
-          renderFullscreenButton={(onClick, isFullscreen) =>
-            isFullscreen ? (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                }}
-              >
-                <button className="button" onClick={() => galleryRef.current?.exitFullScreen()}>
-                  <span className="X"></span>
-                  <span className="Y"></span>
-                  <div className="close">Close</div>
-                </button>
-              </div>
-            ) : null
-          }
-        />
-      </div>
-    </div>
+    <ImageGallery
+      ref={galleryRef}
+      items={galleryImages}
+      onScreenChange={handleScreenChange}
+      onClick={() => galleryRef.current?.fullScreen()}
+      lazyLoad={true}
+      renderFullscreenButton={(onClick, isFullscreen) =>
+        isFullscreen ? (
+          <div
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+            }}
+          >
+            <button className="button" onClick={() => galleryRef.current?.exitFullScreen()}>
+              <span className="X"></span>
+              <span className="Y"></span>
+              <div className="close">Close</div>
+            </button>
+          </div>
+        ) : null
+      }
+    />
   );
 };
 

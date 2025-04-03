@@ -1,0 +1,5 @@
+.image-gallery-thumbnail img {
+  width: 70px; /* Фиксированная ширина */
+  height: 70px; /* Фиксированная высота */
+  object-fit: contain; /* Заполняет квадрат без искажений */
+}
