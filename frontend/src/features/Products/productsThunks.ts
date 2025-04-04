@@ -13,9 +13,14 @@ import { isAxiosError } from 'axios';
 
 export const productsFetch = createAsyncThunk<
   { products: ProductType[]; pageInfo: PageInfo },
-  { id: string; page: number }
->('products/fetch', async ({ id, page }) => {
-  const response = await axiosApi.get(`/products?category=${id}&page=${page}`);
+  { id: string; page: number; sort?: string }
+>('products/fetch', async ({ id, page, sort }) => {
+  const params = new URLSearchParams();
+  params.append('category', id);
+  params.append('page', page.toString());
+  if (sort) params.append('sort', sort);
+
+  const response = await axiosApi.get(`/products?${params.toString()}`);
   return response.data;
 });
 

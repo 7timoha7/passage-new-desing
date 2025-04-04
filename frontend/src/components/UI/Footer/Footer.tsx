@@ -2,7 +2,6 @@ import React from 'react';
 import { AppBar, Box, Container, Grid, Link, Typography, useMediaQuery } from '@mui/material';
 import CallIcon from '@mui/icons-material/Call';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import FacebookIcon from '@mui/icons-material/Facebook';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { FooterStyle, toolbarTobAndBottomColor } from '../../../styles';
 
@@ -25,7 +24,7 @@ const Footer = () => {
             {!isMobile ? (
               <Grid item>
                 <Link href={'/'}>
-                  <img style={{ maxWidth: '300px' }} src="/logo_brown_black.png" alt="passage" />
+                  <img style={{ maxWidth: '200px' }} src="/logo_black_white.png" alt="passage" />
                 </Link>
               </Grid>
             ) : null}
@@ -51,25 +50,7 @@ const Footer = () => {
                     }}
                   >
                     <InstagramIcon sx={{ mr: 0.7 }} />
-                    Passage Матросова
-                  </Link>
-                </Grid>
-                <Grid item sx={{ mt: 1.5 }}>
-                  <Link
-                    href="https://www.instagram.com/passage.kulatova?igsh=eTNxZjQyd2RxazBq"
-                    color="inherit"
-                    underline="none"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{
-                      color: '#FFFFFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      '&:hover': { color: '#ad882c' },
-                    }}
-                  >
-                    <InstagramIcon sx={{ mr: 0.7 }} />
-                    Passage Кулатова
+                    Passage
                   </Link>
                 </Grid>
                 <Grid item sx={{ mt: 1.5 }}>
@@ -88,24 +69,6 @@ const Footer = () => {
                   >
                     <InstagramIcon sx={{ mr: 0.7 }} />
                     Passage Porcelain
-                  </Link>
-                </Grid>
-                <Grid item sx={{ mt: 1.5 }}>
-                  <Link
-                    href="https://www.facebook.com/share/yGScjeLjZW1CJ5aK/?mibextid=qi2Omg"
-                    color="inherit"
-                    underline="none"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{
-                      color: '#FFFFFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      '&:hover': { color: '#ad882c' },
-                    }}
-                  >
-                    <FacebookIcon sx={{ mr: 0.7 }} />
-                    Facebook
                   </Link>
                 </Grid>
               </Grid>

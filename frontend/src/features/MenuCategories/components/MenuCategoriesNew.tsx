@@ -6,6 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Container, Typography } from '@mui/material';
 import { apiURL } from '../../../constants';
 import { useNavigate } from 'react-router-dom';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface Category {
   _id: string;
@@ -81,27 +82,36 @@ const MenuCategoriesNew: React.FC<Props> = ({ close }) => {
     if (thirdLevelCategories.length === 0) return null;
 
     return thirdLevelCategories.map((category) => (
-      <Typography
+      <Box
         key={category._id}
         sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between', // Растягиваем контент по ширине
+          width: '100%', // Занимает всю ширину родителя
           cursor: 'pointer',
           mb: 1,
+          padding: '5px 5px 5px 20px', // Чуть больше отступов
           color: activeCategory?.ID === category.ID ? '#ddbe86' : 'rgb(0,0,0)',
-          '&:hover': { color: '#ddbe86' },
+          backgroundColor: hoveredCategoryID === category.ID ? '#f0f0f0' : 'transparent',
+          borderRadius: '4px',
+          '&:hover': { color: '#ddbe86', backgroundColor: '#f9f9f9' },
           fontSize: '14px',
           textTransform: 'uppercase',
+          transition: 'background-color 0.2s ease',
         }}
         onClick={() => {
           navigate('products/' + category.ID);
           handleCategoryClick(category);
-          setActiveCategory(null); // Закрываем меню при выборе категории 3-го уровня
+          setActiveCategory(null);
           close();
         }}
         onMouseEnter={() => setHoveredCategoryID(category.ID)}
         onMouseLeave={() => setHoveredCategoryID(null)}
       >
-        {category.name}
-      </Typography>
+        <Typography sx={{ flexGrow: 1 }}>{category.name}</Typography> {/* Растягиваем текст на всю доступную ширину */}
+        <ArrowForwardIosIcon sx={{ fontSize: '16px', color: hoveredCategoryID === category.ID ? '#ddbe86' : 'gray' }} />
+      </Box>
     ));
   };
 
@@ -166,7 +176,7 @@ const MenuCategoriesNew: React.FC<Props> = ({ close }) => {
                   height: '550px', // Фиксированная высота для предотвращения изменения размера
                 }}
               >
-                <Box sx={{ padding: '20px' }}>{getThirdLevelCategories(category.ID)}</Box>
+                <Box sx={{ width: '30%', paddingTop: '20px' }}>{getThirdLevelCategories(category.ID)}</Box>
 
                 {/* Картинка справа при наведении */}
                 <Box
@@ -185,10 +195,12 @@ const MenuCategoriesNew: React.FC<Props> = ({ close }) => {
                       style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                     />
                   ) : (
-                    <img
-                      src="https://ortgraph.ru/upload/medialibrary/e29/e290d6e38a4ab2b063d19fafdb48ef7a.jpg"
-                      alt="Category"
-                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    <Box
+                      sx={{
+                        background: '#f9f9f9',
+                        width: '100%',
+                        height: '100%',
+                      }}
                     />
                   )}
                 </Box>
