@@ -67,10 +67,34 @@ productRouter.get('/', async (req, res) => {
       query = { ownerID: { $in: finalCategories } };
     }
 
+    const sortParam = req.query.sort as string;
+    let sort: Record<string, 1 | -1>;
+
+    switch (sortParam) {
+      case 'price_asc':
+        sort = { price: 1 };
+        break;
+      case 'price_desc':
+        sort = { price: -1 };
+        break;
+      case 'name_asc':
+        sort = { name: 1 };
+        break;
+      case 'name_desc':
+        sort = { name: -1 };
+        break;
+      case 'newest':
+        sort = { article: -1 }; // предполагаем, что новые товары имеют больший артикул
+        break;
+      default:
+        sort = {}; // без сортировки
+    }
+
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / pageSize);
 
     const products = await Product.find(query)
+      .sort(sort) // добавили сортировку
       .skip((page - 1) * pageSize)
       .limit(pageSize);
 
