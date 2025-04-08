@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { selectProductsForID, setProductsForID } from '../../../features/ProductsFor/productsForSlice';
 import { selectBanners, selectFetchBannersLoading } from '../../../features/Banners/bannersSlice';
 import { fetchBanners } from '../../../features/Banners/bannersThunks';
-
 import AppToolbar from '../AppToolbar/AppToolbar';
 import MenuCategories from '../../../features/MenuCategories/components/MenuCategories';
 import Footer from '../Footer/Footer';
@@ -13,10 +12,10 @@ import Bestsellers from '../../../features/Bestsellers/Bestsellers';
 import ProductsNews from '../../../features/Products/components/ProductsNews';
 import ProductsFor from '../../../features/ProductsFor/components/ProductsFor';
 import BannerTop from '../../../features/Banners/BannerTop';
-import BannersMiddle from '../../../features/Banners/BannersMiddle';
-import BannersBottom from '../../../features/Banners/BannersBottom';
 import CategoriesMainPage from '../../../features/MenuCategories/components/CategoriesMainPage';
 import ProductsSale from '../../../features/ProductsSale/ProductsSale';
+import { toolbarTobAndBottomColor } from '../../../styles';
+import BreadcrumbsPage from '../BreadcrumbsPage/BreadcrumbsPage';
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const isMobile = useMediaQuery('(max-width:1200px)');
@@ -71,6 +70,14 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
 
       {/* Отступ под фиксированный хедер */}
       <Box sx={{ height: `${toolbarHeight}px` }} />
+
+      {location.pathname !== '/' && (
+        <Box sx={{ background: toolbarTobAndBottomColor }}>
+          <Container maxWidth={'xl'}>
+            <BreadcrumbsPage />
+          </Container>
+        </Box>
+      )}
 
       <MenuCategories />
 

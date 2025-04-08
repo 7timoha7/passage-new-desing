@@ -18,115 +18,121 @@ const BreadcrumbsPage = () => {
   const [breadcrumbs, setBreadcrumbs] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
-    const getCategoryPath = (categoryID: string) => {
-      const category = categories.find((item) => item.ID === categoryID);
-      return category ? category.name : '';
+    const getCategoryByID = (id: string | undefined) => categories.find((item) => item.ID === id);
+
+    // Получение 2-го уровня категории (от корня), начиная с leaf категории
+    const getSecondLevelCategory = (startID: string | undefined) => {
+      if (!startID) return undefined;
+      const path: string[] = [];
+      let current = getCategoryByID(startID);
+
+      while (current) {
+        path.unshift(current.ID);
+        if (!current.ownerID) break;
+        current = getCategoryByID(current.ownerID);
+      }
+
+      const levelIndex = path.length >= 3 ? 2 : path.length - 1;
+      const secondLevel = getCategoryByID(path[levelIndex]);
+      return secondLevel ? { id: secondLevel.ID, name: secondLevel.name } : undefined;
     };
 
-    const generateBreadcrumbs = () => {
-      const baseBreadcrumbs = [
-        <Link
-          sx={{
-            '&:hover': { color: '#f6c011' },
-            textDecoration: 'none',
-          }}
-          key="1"
-          href="/"
-        >
-          ГЛАВНАЯ
-        </Link>,
-      ];
+    const baseBreadcrumbs = [
+      <Link
+        sx={{
+          '&:hover': { color: '#f6c011' },
+          textDecoration: 'none',
+        }}
+        key="home"
+        href="/"
+      >
+        ГЛАВНАЯ
+      </Link>,
+    ];
 
+    const generateBreadcrumbs = () => {
       const breadcrumbMap: { [key: string]: JSX.Element[] } = {
         products: categoryId
           ? [
               ...baseBreadcrumbs,
               <Link
-                sx={{
-                  '&:hover': { color: '#f6c011' },
-                  textDecoration: 'none',
-                }}
+                sx={{ '&:hover': { color: '#f6c011' }, textDecoration: 'none' }}
                 fontWeight={'bold'}
-                key="2"
+                key="cat"
                 href={`/products/${categoryId}`}
               >
-                {getCategoryPath(categoryId) || 'Категория'}
+                {getCategoryByID(categoryId)?.name || 'Категория'}
               </Link>,
             ]
           : [],
         product: productOne
-          ? [
-              ...baseBreadcrumbs,
-              <Link
-                sx={{
-                  '&:hover': { color: '#f6c011' },
-                  textDecoration: 'none',
-                }}
-                key="2"
-                href={`/products/${productOne.ownerID}`}
-              >
-                {getCategoryPath(productOne.ownerID) || 'Категория'}
-              </Link>,
-              <span key="3" style={{ fontWeight: 'bold' }}>
-                {productOne.name}
-              </span>,
-            ]
+          ? (() => {
+              const secondLevel = getSecondLevelCategory(productOne.ownerID);
+              return [
+                ...baseBreadcrumbs,
+                secondLevel && (
+                  <Link
+                    sx={{ '&:hover': { color: '#f6c011' }, textDecoration: 'none' }}
+                    key="cat2"
+                    href={`/products/${secondLevel.id}`}
+                  >
+                    {secondLevel.name}
+                  </Link>
+                ),
+                <span key="product" style={{ fontWeight: 'bold' }}>
+                  {productOne.name}
+                </span>,
+              ].filter(Boolean) as JSX.Element[];
+            })()
           : [],
         productsNews: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="news" style={{ fontWeight: 'bold' }}>
             НОВИНКИ
           </span>,
         ],
         delivery: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="delivery" style={{ fontWeight: 'bold' }}>
             ДОСТАВКА
           </span>,
         ],
         installment: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
-            РАСРОЧКА
+          <span key="installment" style={{ fontWeight: 'bold' }}>
+            РАССРОЧКА
           </span>,
         ],
         warranty: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="warranty" style={{ fontWeight: 'bold' }}>
             ГАРАНТИЯ
           </span>,
         ],
         designers: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="designers" style={{ fontWeight: 'bold' }}>
             ДИЗАЙНЕРАМ
           </span>,
         ],
         designersForm: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="designersForm" style={{ fontWeight: 'bold' }}>
             РЕДАКТИРОВАНИЕ РАЗДЕЛА ДЛЯ ДИЗАЙНЕРОВ
           </span>,
         ],
         contacts: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="contacts" style={{ fontWeight: 'bold' }}>
             КОНТАКТЫ
           </span>,
         ],
         about: [
           ...baseBreadcrumbs,
-          <Link
-            sx={{
-              '&:hover': { color: '#f6c011' },
-              textDecoration: 'none',
-            }}
-            key="2"
-            href="/about"
-          >
+          <Link sx={{ '&:hover': { color: '#f6c011' }, textDecoration: 'none' }} key="aboutLink" href="/about">
             О НАС
           </Link>,
-          <span key="3" style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
+          <span key="brand" style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
             {{
               rakceramics: 'Rak Ceramics',
               kludirak: 'Kludi Rak',
@@ -136,63 +142,48 @@ const BreadcrumbsPage = () => {
         ],
         'my-cabinet': [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="cabinet" style={{ fontWeight: 'bold' }}>
             ЛИЧНЫЙ КАБИНЕТ
           </span>,
         ],
         login: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="login" style={{ fontWeight: 'bold' }}>
             ВХОД
           </span>,
         ],
         register: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="register" style={{ fontWeight: 'bold' }}>
             РЕГИСТРАЦИЯ
           </span>,
         ],
         'search-results': [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="search" style={{ fontWeight: 'bold' }}>
             РЕЗУЛЬТАТ ПОИСКА:
           </span>,
         ],
         basket: [
           ...baseBreadcrumbs,
-          <span key="2" style={{ fontWeight: 'bold' }}>
+          <span key="basket" style={{ fontWeight: 'bold' }}>
             КОРЗИНА
           </span>,
         ],
         order: [
           ...baseBreadcrumbs,
-          <Link
-            sx={{
-              '&:hover': { color: '#f6c011' },
-              textDecoration: 'none',
-            }}
-            key="2"
-            href="/basket"
-          >
+          <Link sx={{ '&:hover': { color: '#f6c011' }, textDecoration: 'none' }} key="basketBack" href="/basket">
             КОРЗИНА
           </Link>,
-          <span key="3" style={{ fontWeight: 'bold' }}>
+          <span key="checkout" style={{ fontWeight: 'bold' }}>
             ОФОРМЛЕНИЕ ЗАКАЗА
           </span>,
         ],
       };
 
-      // Special condition for root and admin paths
       if (location.pathname === '/' || location.pathname === '/admin') {
         setBreadcrumbs([
-          <Link
-            sx={{
-              '&:hover': { color: '#f6c011' },
-              textDecoration: 'none',
-            }}
-            key="1"
-            href="/"
-          >
+          <Link sx={{ '&:hover': { color: '#f6c011' }, textDecoration: 'none' }} key="empty" href="/">
             <span style={{ display: 'block', height: '18px' }}></span>
           </Link>,
         ]);
@@ -207,7 +198,7 @@ const BreadcrumbsPage = () => {
   return (
     <Box sx={{ m: 1 }}>
       <Breadcrumbs sx={{ color: '#b0b0b0', fontSize: '12px' }} separator="›" aria-label="breadcrumb">
-        {breadcrumbs.map((breadcrumb, index) => React.cloneElement(breadcrumb, { key: index, color: '#ffffff' }))}
+        {breadcrumbs.map((breadcrumb, index) => React.cloneElement(breadcrumb, { key: index, color: '#312e2e' }))}
       </Breadcrumbs>
     </Box>
   );

@@ -12,7 +12,7 @@ import { toolbarTobAndBottomColor, ToolBarTopText, ToolBarTopTextSearchBasket } 
 import SearchIcon from '@mui/icons-material/Search';
 import Basket from '../../../../features/Basket/Basket';
 import LinkTel from './Components/LinkTel';
-import ClientsMenuDropdown from '../../../ClientsMenuDropdown/ClientsMenuDropdown';
+import ClientsMenuDropdown from '../../ClientsMenuDropdown/ClientsMenuDropdown';
 
 interface Props {
   close?: () => void;
