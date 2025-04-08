@@ -3,9 +3,10 @@ import img1 from '../../frontend/src/assets/images/newFon/13.jpeg';
 export const ToolBarTopText = {
   color: '#1D1D1D',
   fontSize: '15px',
-  textDecoration: 'none',
   marginRight: '50px',
+  cursor: 'pointer',
   ':hover': { color: '#ddbe86' },
+  textTransform: 'uppercase',
 };
 
 export const ToolBarTopTextSearchBasket = {

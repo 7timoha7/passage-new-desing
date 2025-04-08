@@ -18,7 +18,6 @@ const LinkTel = () => {
       sx={{
         color: 'rgb(0,0,0)',
         fontSize: '15px',
-        // fontWeight: 'bold',
         display: 'flex',
         alignItems: 'center',
         cursor: 'pointer',

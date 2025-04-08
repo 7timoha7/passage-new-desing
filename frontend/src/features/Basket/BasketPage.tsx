@@ -103,7 +103,7 @@ const BasketPage = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ m: 2, p: 2 }}>
+    <Box sx={{ m: 2, p: 2 }}>
       <Typography variant="h4" gutterBottom textAlign={'center'}>
         Корзина
       </Typography>
@@ -346,7 +346,7 @@ const BasketPage = () => {
           )}
         </>
       )}
-    </Paper>
+    </Box>
   );
 };
 

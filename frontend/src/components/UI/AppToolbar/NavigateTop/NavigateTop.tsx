@@ -1,9 +1,9 @@
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import MenuCategoriesNew from '../../../../features/MenuCategories/components/MenuCategoriesNew';
-import { Button, Container, useMediaQuery } from '@mui/material';
+import { Button, Container, Typography, useMediaQuery } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import UserMenu from '../UserMenu';
 import AnonymousMenu from '../AnonymousMenu';
 import { useAppSelector } from '../../../../app/hooks';
@@ -12,6 +12,7 @@ import { toolbarTobAndBottomColor, ToolBarTopText, ToolBarTopTextSearchBasket } 
 import SearchIcon from '@mui/icons-material/Search';
 import Basket from '../../../../features/Basket/Basket';
 import LinkTel from './Components/LinkTel';
+import ClientsMenuDropdown from '../../../ClientsMenuDropdown/ClientsMenuDropdown';
 
 interface Props {
   close?: () => void;
@@ -40,8 +41,11 @@ const CatalogDropdown = styled(Box)({
 
 const NavigateTop: React.FC<Props> = ({ close }) => {
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [clientsOpen, setClientsOpen] = useState(false);
   const catalogRef = useRef<HTMLDivElement | null>(null);
   const catalogButtonRef = useRef<HTMLButtonElement | null>(null);
+  const clientsRef = useRef<HTMLDivElement | null>(null);
+  const clientsButtonRef = useRef<HTMLDivElement | null>(null);
 
   const menu = [
     { name: 'Контакты', link: '/contacts' },
@@ -53,7 +57,6 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
   const isMobileMenu = useMediaQuery('(min-width: 1200px)');
   const user = useAppSelector(selectUser);
 
-  // Обработчик клика вне меню
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -64,18 +67,19 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
       ) {
         setCatalogOpen(false);
       }
+      if (
+        clientsRef.current &&
+        !clientsRef.current.contains(event.target as Node) &&
+        clientsButtonRef.current &&
+        !clientsButtonRef.current.contains(event.target as Node)
+      ) {
+        setClientsOpen(false);
+      }
     };
 
-    if (catalogOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [catalogOpen]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <NavigateTopWrapper>
@@ -90,15 +94,19 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
 
             <Box display="flex" flexWrap={'wrap'} alignItems={'center'} sx={{ padding: '7px' }}>
               <Box display="flex" justifyContent={!isMobile ? 'center' : 'start'} alignItems={'center'}>
-                <Button ref={catalogButtonRef} sx={ToolBarTopText} onClick={() => setCatalogOpen((prev) => !prev)}>
+                <Typography ref={catalogButtonRef} sx={ToolBarTopText} onClick={() => setCatalogOpen((prev) => !prev)}>
                   Каталог
-                </Button>
+                </Typography>
 
                 {menu.map((item) => (
-                  <Button sx={ToolBarTopText} onClick={close} component={Link} to={item.link} key={item.name}>
+                  <Typography sx={ToolBarTopText} onClick={close} component={Link} to={item.link} key={item.name}>
                     {item.name}
-                  </Button>
+                  </Typography>
                 ))}
+
+                <Typography ref={clientsButtonRef} sx={ToolBarTopText} onClick={() => setClientsOpen((prev) => !prev)}>
+                  Клиентам
+                </Typography>
               </Box>
             </Box>
 
@@ -126,10 +134,15 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
         </Box>
       )}
 
-      {/* Каталог */}
       {catalogOpen && (
         <CatalogDropdown ref={catalogRef}>
           <MenuCategoriesNew close={() => setCatalogOpen(false)} />
+        </CatalogDropdown>
+      )}
+
+      {clientsOpen && (
+        <CatalogDropdown ref={clientsRef}>
+          <ClientsMenuDropdown close={() => setClientsOpen(false)} />
         </CatalogDropdown>
       )}
     </NavigateTopWrapper>
