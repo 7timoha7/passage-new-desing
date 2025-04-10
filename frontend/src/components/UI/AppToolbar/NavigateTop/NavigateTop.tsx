@@ -13,6 +13,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import Basket from '../../../../features/Basket/Basket';
 import LinkTel from './Components/LinkTel';
 import ClientsMenuDropdown from '../../ClientsMenuDropdown/ClientsMenuDropdown';
+import Search from './Components/Search';
 
 interface Props {
   close?: () => void;
@@ -42,10 +43,14 @@ const CatalogDropdown = styled(Box)({
 const NavigateTop: React.FC<Props> = ({ close }) => {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [clientsOpen, setClientsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
   const catalogRef = useRef<HTMLDivElement | null>(null);
   const catalogButtonRef = useRef<HTMLButtonElement | null>(null);
   const clientsRef = useRef<HTMLDivElement | null>(null);
   const clientsButtonRef = useRef<HTMLDivElement | null>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
+  const searchButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const menu = [
     { name: 'Контакты', link: '/contacts' },
@@ -74,6 +79,14 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
         !clientsButtonRef.current.contains(event.target as Node)
       ) {
         setClientsOpen(false);
+      }
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node) &&
+        searchButtonRef.current &&
+        !searchButtonRef.current.contains(event.target as Node)
+      ) {
+        setSearchOpen(false);
       }
     };
 
@@ -113,7 +126,12 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
             {isMobileMenu && <LinkTel />}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Button sx={ToolBarTopTextSearchBasket} color="inherit">
+              <Button
+                ref={searchButtonRef}
+                sx={ToolBarTopTextSearchBasket}
+                color="inherit"
+                onClick={() => setSearchOpen((prev) => !prev)}
+              >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <SearchIcon fontSize={'medium'} />
                   <p style={{ fontSize: '9px', margin: 0, padding: 0 }}>Поиск</p>
@@ -143,6 +161,12 @@ const NavigateTop: React.FC<Props> = ({ close }) => {
       {clientsOpen && (
         <CatalogDropdown ref={clientsRef}>
           <ClientsMenuDropdown close={() => setClientsOpen(false)} />
+        </CatalogDropdown>
+      )}
+
+      {searchOpen && (
+        <CatalogDropdown ref={searchRef}>
+          <Search />
         </CatalogDropdown>
       )}
     </NavigateTopWrapper>

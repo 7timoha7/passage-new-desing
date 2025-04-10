@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { ImageGallery } from 'react-image-grid-gallery';
-import { Box, CardMedia, Grid, Paper, Typography, useMediaQuery } from '@mui/material';
+import { Box, CardMedia, Grid, Typography, useMediaQuery } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -63,7 +63,7 @@ const Designers = () => {
         ДИЗАЙНЕРАМ
       </Typography>
 
-      <Paper
+      <Box
         sx={{
           p: 3,
           mt: 2,
@@ -193,7 +193,7 @@ const Designers = () => {
             )}
           </Box>
         </Box>
-      </Paper>
+      </Box>
 
       {user && user.role === 'admin' && (
         <Box textAlign={'center'} mt={3}>

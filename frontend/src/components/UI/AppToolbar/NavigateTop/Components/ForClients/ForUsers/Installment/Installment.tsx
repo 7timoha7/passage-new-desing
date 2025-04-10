@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const Installment = () => {
   return (
@@ -7,7 +7,7 @@ const Installment = () => {
       <Typography sx={{ mt: '30px', mb: '20px' }} variant="h4">
         РАСРОЧКА
       </Typography>
-      <Paper
+      <Box
         sx={{
           p: 3,
           mt: 2,
@@ -36,7 +36,7 @@ const Installment = () => {
         <Typography variant="body1" paragraph>
           Покупайте сейчас, платите позже - это легко и удобно с Passage!
         </Typography>
-      </Paper>
+      </Box>
     </>
   );
 };

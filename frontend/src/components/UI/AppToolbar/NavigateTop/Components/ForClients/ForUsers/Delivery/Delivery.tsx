@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
+import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { AccessTime, CheckCircleOutline, DirectionsCar, DoorFront, MonetizationOn } from '@mui/icons-material';
 import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
 
@@ -9,7 +9,7 @@ const Delivery = () => {
       <Typography sx={{ mt: '30px' }} variant="h4">
         ДОСТАВКА
       </Typography>
-      <Paper
+      <Box
         sx={{
           p: 3,
           mt: 2,
@@ -64,7 +64,7 @@ const Delivery = () => {
             <ListItemText primary="Клиенту нужно заранее позаботиться о грузчиках. Водитель не занимается выгрузкой" />
           </ListItem>
         </List>
-      </Paper>
+      </Box>
     </>
   );
 };

@@ -1,20 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  Grid,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, CircularProgress, Grid, IconButton, Paper, Stack, Typography } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Spinner from '../../components/UI/Spinner/Spinner';
@@ -103,248 +90,181 @@ const BasketPage = () => {
   };
 
   return (
-    <Box sx={{ m: 2, p: 2 }}>
-      <Typography variant="h4" gutterBottom textAlign={'center'}>
+    <Box sx={{ mt: 2 }}>
+      <Typography variant="h4" gutterBottom>
         Корзина
       </Typography>
       {oneBasketLoading ? (
         <Spinner />
-      ) : (
-        <>
-          {basket?.items ? (
-            <>
-              <TableContainer component={Paper} sx={{ marginBottom: 2 }}>
-                <Table>
-                  <TableBody>
-                    {basket.items.map((item, index) => (
-                      <TableRow key={item.product.goodID + index}>
-                        <TableCell sx={{ borderBottom: '4px solid #404040', borderTop: '4px solid #404040' }}>
-                          <Grid
-                            container
-                            spacing={2}
-                            onClick={() => navigate('/product/' + item.product.goodID)}
-                            sx={{ cursor: 'pointer' }}
+      ) : basket?.items?.length ? (
+        <Grid container spacing={2}>
+          {/* Левая колонка с карточками товаров */}
+          <Grid item xs={12} md={8}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {basket.items.map((item, index) => (
+                <Paper key={item.product.goodID + index} sx={{ p: 2 }}>
+                  <Grid container spacing={2}>
+                    <Grid item onClick={() => navigate('/product/' + item.product.goodID)}>
+                      <LazyLoadImage
+                        src={item.product.images[0] ? apiURL + '/' + item.product.images[0] : noImg}
+                        alt={item.product.name}
+                        width="200px"
+                        height="200px"
+                        style={{ objectFit: 'contain', cursor: 'pointer' }}
+                        placeholderSrc={placeHolderImg}
+                        effect="blur"
+                      />
+                    </Grid>
+                    <Grid item xs>
+                      <Typography
+                        variant="body1"
+                        gutterBottom
+                        onClick={() => navigate('/product/' + item.product.goodID)}
+                        sx={{ cursor: 'pointer' }}
+                      >
+                        Наименование: <strong>{item.product.name}</strong>
+                      </Typography>
+                      <Box display="flex" alignItems="center" justifyContent="space-between" mt={1}>
+                        Количество:
+                        <Box display="flex" alignItems="center">
+                          <IconButton
+                            sx={{ p: 0.5, color: btnPlusBasket, '&:hover': { color: btnPlusBasketHover } }}
+                            disabled={
+                              addBasketLoading === item.product.goodID || isAddButtonDisabled(item.product.goodID)
+                            }
+                            onClick={() => handleUpdateBasket(item.product.goodID, 'increase')}
                           >
-                            <Grid item>
-                              <LazyLoadImage
-                                src={item.product.images[0] ? apiURL + '/' + item.product.images[0] : noImg}
-                                alt={item.product.name}
-                                width="40px"
-                                height="40px"
-                                style={{ objectFit: 'contain' }}
-                                placeholderSrc={placeHolderImg}
-                                effect="blur"
-                              />
-                            </Grid>
+                            {addBasketLoading === item.product.goodID ? (
+                              <CircularProgress size={20} color="error" />
+                            ) : (
+                              <AddCircleOutlineIcon />
+                            )}
+                          </IconButton>
+                          <span>{item.quantity}</span>
+                          <IconButton
+                            sx={{ p: 0.5 }}
+                            disabled={addBasketLoading === item.product.goodID}
+                            onClick={() =>
+                              item.quantity === 1
+                                ? handleUpdateBasket(item.product.goodID, 'remove')
+                                : handleUpdateBasket(item.product.goodID, 'decrease')
+                            }
+                          >
+                            {addBasketLoading === item.product.goodID ? (
+                              <CircularProgress size={20} color="error" />
+                            ) : (
+                              <RemoveCircleOutlineIcon style={{ color: 'black' }} />
+                            )}
+                          </IconButton>
+                        </Box>
+                      </Box>
 
-                            <Grid item>
-                              <Typography variant="body1" gutterBottom>
-                                Наименование: <span style={{ fontWeight: 'bold' }}>{item.product.name}</span>
+                      {item.product.size && (
+                        <Box mt={1}>
+                          М²:{' '}
+                          <Typography fontSize="14px" fontWeight="bold" display="inline">
+                            {textMeters(item.quantity, calculateSquareAreaInSquareMeters(item.product.size))}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      {isAddButtonDisabled(item.product.goodID) && (
+                        <Box mt={2}>
+                          <Typography color="red" variant="caption">
+                            Этот товар доступен под заказ. Точную цену и количество уточнит менеджер. Оставьте заявку —
+                            мы свяжемся с вами для оформления.
+                          </Typography>
+                          <Box display="flex" alignItems="center" justifyContent="space-between" mt={1}>
+                            <Typography fontSize="0.875rem">Количество под заказ:</Typography>
+                            <Box display="flex" alignItems="center">
+                              <IconButton
+                                sx={{ p: 0.5, color: btnPlusBasket, '&:hover': { color: btnPlusBasketHover } }}
+                                disabled={addBasketLoading === item.product.goodID}
+                                onClick={() => handleUpdateBasket(item.product.goodID, 'increaseToOrder')}
+                              >
+                                {addBasketLoading === item.product.goodID ? (
+                                  <CircularProgress size={20} color="error" />
+                                ) : (
+                                  <AddCircleOutlineIcon />
+                                )}
+                              </IconButton>
+                              <span>{item.quantityToOrder}</span>
+                              <IconButton
+                                sx={{ p: 0.5 }}
+                                disabled={addBasketLoading === item.product.goodID || item.quantityToOrder === 0}
+                                onClick={() => handleUpdateBasket(item.product.goodID, 'decreaseToOrder')}
+                              >
+                                {addBasketLoading === item.product.goodID ? (
+                                  <CircularProgress size={20} color="error" />
+                                ) : (
+                                  <RemoveCircleOutlineIcon
+                                    style={item.quantityToOrder > 0 ? { color: 'black' } : undefined}
+                                  />
+                                )}
+                              </IconButton>
+                            </Box>
+                          </Box>
+                          {item.product.size && item.quantityToOrder > 0 && (
+                            <Box mt={1}>
+                              М²:{' '}
+                              <Typography fontSize="14px" fontWeight="bold" display="inline">
+                                {textMeters(item.quantityToOrder, calculateSquareAreaInSquareMeters(item.product.size))}
                               </Typography>
-                            </Grid>
-                          </Grid>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
 
-                          <Table size="small">
-                            <TableBody>
-                              <TableRow>
-                                <TableCell
-                                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                                  colSpan={2} // объединяем ячейки в одну строку
-                                >
-                                  Количество:
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                    }}
-                                  >
-                                    <IconButton
-                                      sx={{
-                                        p: 0.5,
-                                        color: btnPlusBasket, // Цвет контура кнопки
+                      <Box mt={2}>Сумма: {(item.product.price * item.quantity).toFixed(2)} сом</Box>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+            </Box>
+          </Grid>
 
-                                        '&:hover': {
-                                          color: btnPlusBasketHover, // Цвет контура кнопки при наведении
-                                        },
-                                      }}
-                                      disabled={
-                                        addBasketLoading === item.product.goodID ||
-                                        isAddButtonDisabled(item.product.goodID)
-                                      }
-                                      color="primary"
-                                      onClick={() => handleUpdateBasket(item.product.goodID, 'increase')}
-                                    >
-                                      {addBasketLoading === item.product.goodID ? (
-                                        <CircularProgress size={'20px'} color="error" />
-                                      ) : (
-                                        <AddCircleOutlineIcon />
-                                      )}
-                                    </IconButton>
-                                    <span>{item.quantity}</span>
-                                    <IconButton
-                                      sx={{ p: 0.5 }}
-                                      disabled={addBasketLoading === item.product.goodID}
-                                      color="primary"
-                                      onClick={() =>
-                                        item.quantity === 1
-                                          ? handleUpdateBasket(item.product.goodID, 'remove')
-                                          : handleUpdateBasket(item.product.goodID, 'decrease')
-                                      }
-                                    >
-                                      {addBasketLoading === item.product.goodID ? (
-                                        <CircularProgress size={'20px'} color="error" />
-                                      ) : (
-                                        <RemoveCircleOutlineIcon style={{ color: 'black' }} />
-                                      )}
-                                    </IconButton>
-                                  </Box>
-                                </TableCell>
-                              </TableRow>
-                              {item.product.size && (
-                                <TableRow>
-                                  <TableCell
-                                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                                    colSpan={2} // объединяем ячейки в одну строку
-                                  >
-                                    М²:
-                                    <Typography fontSize={'14px'} fontWeight={'bold'}>
-                                      {textMeters(item.quantity, calculateSquareAreaInSquareMeters(item.product.size))}
-                                    </Typography>
-                                  </TableCell>
-                                </TableRow>
-                              )}
-
-                              {isAddButtonDisabled(item.product.goodID) && (
-                                <TableRow>
-                                  <TableCell sx={{ border: '1px solid black' }}>
-                                    <Typography color={'red'} variant={'caption'} sx={{ alignSelf: 'flex-end' }}>
-                                      Здесь вы можете оставить заявку на товар под заказ. Цену и количество уточняйте у
-                                      менеджера, так как они могут отличаться. Сумма за товары под заказ учитывается
-                                      отдельно. Оставьте заявку, вам перезвонят для оформления.
-                                    </Typography>
-
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                      }}
-                                    >
-                                      <Typography fontSize={'0.875rem'}> Количество под заказ:</Typography>
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                        }}
-                                      >
-                                        <IconButton
-                                          sx={{
-                                            p: 0.5,
-                                            color: btnPlusBasket, // Цвет контура кнопки
-                                            '&:hover': {
-                                              color: btnPlusBasketHover, // Цвет контура кнопки при наведении
-                                            },
-                                          }}
-                                          disabled={addBasketLoading === item.product.goodID}
-                                          onClick={() => handleUpdateBasket(item.product.goodID, 'increaseToOrder')}
-                                          color="success"
-                                        >
-                                          {addBasketLoading === item.product.goodID ? (
-                                            <CircularProgress size={'20px'} color="error" />
-                                          ) : (
-                                            <AddCircleOutlineIcon />
-                                          )}
-                                        </IconButton>
-                                        <span>{item.quantityToOrder}</span>
-                                        <IconButton
-                                          sx={{ p: 0.5 }}
-                                          onClick={() => handleUpdateBasket(item.product.goodID, 'decreaseToOrder')}
-                                          color="primary"
-                                          disabled={
-                                            addBasketLoading === item.product.goodID || item.quantityToOrder === 0
-                                          }
-                                        >
-                                          {addBasketLoading === item.product.goodID ? (
-                                            <CircularProgress size={'20px'} color="error" />
-                                          ) : (
-                                            <RemoveCircleOutlineIcon
-                                              style={item.quantityToOrder > 0 ? { color: 'black' } : undefined}
-                                            />
-                                          )}
-                                        </IconButton>
-                                      </Box>
-                                    </Box>
-                                    {item.product.size && item.quantityToOrder > 0 && (
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'space-between',
-                                        }}
-                                        borderTop={'1px solid rgba(224, 224, 224, 1)'}
-                                        pt={0.5}
-                                        mt={0.5}
-                                      >
-                                        <Typography fontSize={'0.875rem'}> М²:</Typography>
-                                        <Typography fontSize={'14px'} fontWeight={'bold'}>
-                                          {textMeters(
-                                            item.quantityToOrder,
-                                            calculateSquareAreaInSquareMeters(item.product.size),
-                                          )}
-                                        </Typography>
-                                      </Box>
-                                    )}
-                                  </TableCell>
-                                </TableRow>
-                              )}
-                              <TableRow>
-                                <TableCell colSpan={2}>
-                                  Сумма: {(item.product.price * item.quantity).toFixed(2)} сом
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <Divider sx={{ marginY: 2 }} />
+          {/* Правая колонка с итогом и кнопками */}
+          <Grid item xs={12} md={4}>
+            <Box
+              sx={{
+                position: 'sticky',
+                top: 100,
+                p: 2,
+                border: '1px solid #ccc',
+                borderRadius: 2,
+                backgroundColor: '#fff',
+              }}
+            >
               <Typography variant="h5" gutterBottom>
                 Общая сумма: {basket.totalPrice} сом
               </Typography>
-              <Grid container spacing={2} justifyContent="flex-end">
-                <Grid item>
-                  <LoadingButton
-                    loading={loadingBasket()}
-                    disabled={basket?.items?.length === 0}
-                    onClick={() => navigate('/order')}
-                    variant="contained"
-                    sx={btnBasketColorAdd}
-                  >
-                    Оформить заказ
-                  </LoadingButton>
-                </Grid>
-                <Grid item>
-                  <LoadingButton
-                    loading={loadingBasket()}
-                    disabled={basket?.items?.length === 0}
-                    variant="outlined"
-                    onClick={() => clearBasket('clear')}
-                    sx={btnColorClearBasket}
-                  >
-                    Очистить корзину
-                  </LoadingButton>
-                </Grid>
-              </Grid>
-            </>
-          ) : (
-            <Typography variant="h5" gutterBottom textAlign={'center'}>
-              Нет товаров
-            </Typography>
-          )}
-        </>
+              <Stack spacing={2}>
+                <LoadingButton
+                  loading={loadingBasket()}
+                  disabled={basket.items.length === 0}
+                  onClick={() => navigate('/order')}
+                  variant="contained"
+                  sx={btnBasketColorAdd}
+                >
+                  Оформить заказ
+                </LoadingButton>
+                <LoadingButton
+                  loading={loadingBasket()}
+                  disabled={basket.items.length === 0}
+                  variant="outlined"
+                  onClick={() => clearBasket('clear')}
+                  sx={btnColorClearBasket}
+                >
+                  Очистить корзину
+                </LoadingButton>
+              </Stack>
+            </Box>
+          </Grid>
+        </Grid>
+      ) : (
+        <Typography variant="h5" gutterBottom textAlign="center">
+          Нет товаров
+        </Typography>
       )}
     </Box>
   );

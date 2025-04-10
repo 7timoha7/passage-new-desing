@@ -66,7 +66,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <Box>
-      <Box textAlign="center" mb={2}>
+      <Box mb={2}>
         <Typography variant={'h4'}>Результат поиска для &ldquo;{text}&rdquo;</Typography>
       </Box>
 

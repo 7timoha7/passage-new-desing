@@ -16,6 +16,8 @@ import {
 } from '../../../../../features/Products/productsSlice';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { Container, ThemeProvider } from '@mui/material';
+import { themeBlackSelect } from '../../../../../theme';
 
 const CustomSearchBar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -80,112 +82,117 @@ const CustomSearchBar: React.FC = () => {
   }, [handleClickOutside]);
 
   return (
-    <Box position="relative" width="100%" sx={{ background: 'rgba(90,30,30,0.68)', p: 0.9, borderRadius: '18px' }}>
-      <TextField
-        size="small"
-        label="ЖИВОЙ ПОИСК"
-        type="search"
-        value={query}
-        onChange={(e) => onChange(e)}
-        fullWidth
-        InputProps={{
-          endAdornment: (
-            <>
-              {searchLoadingPreview && <CircularProgress color="inherit" size={15} />}
-              <Button
-                variant="text"
-                size="small"
-                color="inherit"
-                onClick={handleExtendedSearch}
-                style={{ marginLeft: '8px' }}
-              >
-                <SearchIcon />
-              </Button>
-            </>
-          ),
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            handleExtendedSearch();
-          }
-        }}
-        onFocus={() => dispatch(clearSearchResultsPreview())}
-      />
-      {searchResultsPreview.results.length > 0 && (
-        <Box>
-          <ul
-            ref={menuRef}
-            style={{
-              listStyle: 'none',
-              margin: 0,
-              padding: 0,
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              width: '100%',
-              boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.1)',
-              backgroundColor: 'white',
-              zIndex: 2,
-              overflowY: 'auto',
-              maxHeight: '400px',
-            }}
-          >
-            {searchResultsPreview.results.map((option) => (
-              <li
-                key={option._id}
-                style={{
-                  padding: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  borderBottom: '1px solid #ccc',
-                  color: 'black',
-                }}
-                onClick={() => handleProductCard(option.goodID)}
-              >
-                <Box marginRight={2}>
-                  <LazyLoadImage
-                    src={option.images[0] ? apiURL + '/' + option.images[0] : noImg}
-                    alt={option.name}
-                    width="35px"
-                    height="35px"
-                    style={{ objectFit: 'contain' }}
-                    placeholderSrc={placeHolderImg}
-                    effect="blur"
-                  />
-                </Box>
-
-                <div>
-                  <div
-                    style={{
-                      fontWeight: 'bold',
-                    }}
+    <Container maxWidth={'md'}>
+      <Box position="relative" width="100%" sx={{ p: 0.9, borderRadius: '18px' }}>
+        <ThemeProvider theme={themeBlackSelect}>
+          <TextField
+            size="small"
+            label="ЖИВОЙ ПОИСК"
+            type="search"
+            value={query}
+            onChange={(e) => onChange(e)}
+            fullWidth
+            InputProps={{
+              endAdornment: (
+                <>
+                  {searchLoadingPreview && <CircularProgress color="inherit" size={15} />}
+                  <Button
+                    variant="text"
+                    size="small"
+                    color="inherit"
+                    onClick={handleExtendedSearch}
+                    style={{ marginLeft: '8px' }}
                   >
-                    {option.name}
+                    <SearchIcon />
+                  </Button>
+                </>
+              ),
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleExtendedSearch();
+              }
+            }}
+            onFocus={() => dispatch(clearSearchResultsPreview())}
+          />
+        </ThemeProvider>
+
+        {searchResultsPreview.results.length > 0 && (
+          <Box>
+            <ul
+              ref={menuRef}
+              style={{
+                listStyle: 'none',
+                margin: 0,
+                padding: 0,
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                width: '100%',
+                boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.1)',
+                backgroundColor: 'white',
+                zIndex: 2,
+                overflowY: 'auto',
+                maxHeight: '400px',
+              }}
+            >
+              {searchResultsPreview.results.map((option) => (
+                <li
+                  key={option._id}
+                  style={{
+                    padding: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid #ccc',
+                    color: 'black',
+                  }}
+                  onClick={() => handleProductCard(option.goodID)}
+                >
+                  <Box marginRight={2}>
+                    <LazyLoadImage
+                      src={option.images[0] ? apiURL + '/' + option.images[0] : noImg}
+                      alt={option.name}
+                      width="35px"
+                      height="35px"
+                      style={{ objectFit: 'contain' }}
+                      placeholderSrc={placeHolderImg}
+                      effect="blur"
+                    />
+                  </Box>
+
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {option.name}
+                    </div>
+                    <div style={{ marginLeft: '8px' }}>Цена: {option.price}</div>
                   </div>
-                  <div style={{ marginLeft: '8px' }}>Цена: {option.price}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-          {searchResultsPreview.hasMore && (
-            <Box display="flex" justifyContent="center">
-              <Button
-                sx={{
-                  color: '#e39912', // Цвет контура кнопки
-                  '&:hover': {
-                    color: '#ffffff', // Цвет контура кнопки при наведении
-                  },
-                }}
-                onClick={handleExtendedSearch}
-              >
-                Все результаты
-              </Button>
-            </Box>
-          )}
-        </Box>
-      )}
-    </Box>
+                </li>
+              ))}
+            </ul>
+            {searchResultsPreview.hasMore && (
+              <Box display="flex" justifyContent="center">
+                <Button
+                  sx={{
+                    color: '#e39912', // Цвет контура кнопки
+                    '&:hover': {
+                      color: '#ffffff', // Цвет контура кнопки при наведении
+                    },
+                  }}
+                  onClick={handleExtendedSearch}
+                >
+                  Все результаты
+                </Button>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
+    </Container>
   );
 };
 
