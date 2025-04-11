@@ -9,7 +9,6 @@ import { selectCategories } from '../menuCategoriesSlice';
 import { fetchCategories } from '../menuCategoriesThunks';
 import { Typography } from '@mui/material';
 import Categories from './Categories';
-import NavigateTop from '../../../components/UI/AppToolbar/NavigateTop/NavigateTop';
 import img1 from '../../../assets/images/newFon/17.jpeg';
 import { toolbarTobAndBottomColor } from '../../../styles';
 import { Link } from 'react-router-dom';
@@ -81,9 +80,7 @@ const MenuCategories = () => {
               <img style={{ maxWidth: '200px' }} src="/logo_brown_mobile.png" alt="passage" />
             </Link>
           </Box>
-          <Box>
-            <NavigateTop close={closeMenu} />
-          </Box>
+
           <Box>
             <Typography
               sx={{ m: 0, pt: 1.2, pb: 1.2 }}

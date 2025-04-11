@@ -46,7 +46,7 @@ const UserMenu: React.FC<Props> = ({ user, close }) => {
   return (
     <>
       <Grid container>
-        <Button onClick={handleClick} color="inherit" sx={{ color: 'white' }}>
+        <Button onClick={handleClick} color="inherit" sx={{ color: 'black' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Typography sx={{ mr: 1 }} fontWeight="bold">{`${user.firstName} ${user.lastName}`}</Typography>
             <MenuIcon fontSize={'medium'} sx={{ mt: '-4px' }} />
@@ -62,22 +62,21 @@ const UserMenu: React.FC<Props> = ({ user, close }) => {
           paper: {
             sx: {
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, rgb(90, 30, 30), rgb(39, 14, 14));',
             },
           },
         }}
       >
         <div>
-          <MenuItem onClick={() => onMenuItemClick('/my-cabinet')} sx={{ color: 'white' }}>
+          <MenuItem onClick={() => onMenuItemClick('/my-cabinet')} sx={{ color: 'black' }}>
             <ListItemIcon>
-              <PersonIcon sx={{ color: 'white' }} />
+              <PersonIcon sx={{ color: 'black' }} />
             </ListItemIcon>
             Мой профиль
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleLogout} sx={{ color: 'white' }}>
+          <MenuItem onClick={handleLogout} sx={{ color: 'black' }}>
             <ListItemIcon>
-              <ExitToAppIcon sx={{ color: 'white' }} />
+              <ExitToAppIcon sx={{ color: 'black' }} />
             </ListItemIcon>
             Выйти
           </MenuItem>

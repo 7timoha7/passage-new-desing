@@ -6,7 +6,6 @@ import { selectProductsForID, setProductsForID } from '../../../features/Product
 import { selectBanners, selectFetchBannersLoading } from '../../../features/Banners/bannersSlice';
 import { fetchBanners } from '../../../features/Banners/bannersThunks';
 import AppToolbar from '../AppToolbar/AppToolbar';
-import MenuCategories from '../../../features/MenuCategories/components/MenuCategories';
 import Footer from '../Footer/Footer';
 import Bestsellers from '../../../features/Bestsellers/Bestsellers';
 import ProductsNews from '../../../features/Products/components/ProductsNews';
@@ -78,8 +77,6 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
           </Container>
         </Box>
       )}
-
-      <MenuCategories />
 
       {location.pathname === '/' && (
         <Box>

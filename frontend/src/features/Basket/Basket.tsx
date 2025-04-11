@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Badge } from '@mui/material';
+import { Badge, IconButton, useMediaQuery } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { createBasket, fetchBasket } from './basketThunks';
@@ -15,6 +15,7 @@ const Basket = () => {
   const basket = useAppSelector(selectBasket);
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
+  const isMobileMenu = useMediaQuery('(min-width: 1200px)');
 
   useEffect(() => {
     if (user) {
@@ -33,25 +34,27 @@ const Basket = () => {
 
   return (
     <>
-      <Button
-        aria-label="Корзина"
-        color="inherit"
-        onClick={() => navigate('/basket')}
-        // sx={{
-        //   background: toolbarTobAndBottomColor,
-        //   '&:hover': {
-        //     background: 'rgba(90,30,30,0.67)',
-        //   },
-        // }}
-        sx={ToolBarTopTextSearchBasket}
-      >
-        <Badge badgeContent={basket?.items?.length || 0} color="error">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {isMobileMenu ? (
+        <Button
+          aria-label="Корзина"
+          color="inherit"
+          onClick={() => navigate('/basket')}
+          sx={ToolBarTopTextSearchBasket}
+        >
+          <Badge badgeContent={basket?.items?.length || 0} color="error">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <ShoppingCartIcon fontSize="medium" />
+              <p style={{ fontSize: '9px', margin: 0, padding: 0 }}>Корзина</p>
+            </div>
+          </Badge>
+        </Button>
+      ) : (
+        <IconButton color="inherit" onClick={() => navigate('/basket')} sx={ToolBarTopTextSearchBasket}>
+          <Badge badgeContent={basket?.items?.length || 0} color="error">
             <ShoppingCartIcon fontSize="medium" />
-            <p style={{ fontSize: '9px', margin: 0, padding: 0 }}>Корзина</p>
-          </div>
-        </Badge>
-      </Button>
+          </Badge>
+        </IconButton>
+      )}
     </>
   );
 };
