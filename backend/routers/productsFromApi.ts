@@ -73,50 +73,85 @@ const processDescription = (
   description: string;
   type: string;
   quantity?: string;
+  characteristics?: { key: string; value: string }[];
 } => {
-  // Разделяем строку по разделителю "\\" и удаляем пробелы
-  const parts = description.split('\\\\').map((part) => part.trim());
+  let characteristics: { key: string; value: string }[] | undefined;
 
-  // Если разделители присутствуют, используем их для определения size, thickness и description
+  // Извлекаем блок { ... }, включая переносы строк и запятые
+  const match = description.match(/{([\s\S]*?)}/);
+
+  if (match) {
+    const rawBlock = match[1];
+
+    characteristics = rawBlock
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.includes(':'))
+      .map((line) => {
+        // Убираем лишние запятые и пробелы
+        const [key, ...rest] = line.replace(/,$/, '').split(':');
+        return {
+          key: key.trim(),
+          value: rest.join(':').trim(),
+        };
+      });
+
+    // Удаляем блок характеристик из исходного описания
+    description = description.replace(match[0], '').trim();
+  }
+
+  const parts = description
+    .split('\\\\')
+    .map((part) => part.trim())
+    .filter((part) => part !== '');
+
+  let result: {
+    size: string;
+    thickness: string;
+    description: string;
+    type: string;
+    quantity?: string;
+    characteristics?: { key: string; value: string }[];
+  };
+
   if (parts.length > 1) {
-    // Если первая часть строки точно соответствует "Ковролин\\"
     if (parts[0] === 'Ковролин') {
-      return {
-        size: parts[1] || '', // size
-        thickness: '', // Для Ковролина толщина не указывается
-        description: parts.slice(2).join('\\\\') || '', // description
+      result = {
+        size: parts[1] || '',
+        thickness: '',
+        description: parts.slice(2).join('\\\\') || '',
         type: 'Ковролин',
       };
-    }
-    // Если первая часть строки точно соответствует "Ламинат\\"
-    else if (parts[0] === 'Ламинат') {
-      return {
-        size: parts[1] || '', // size
-        thickness: parts[2] || '', // thickness
-        quantity: parts[3] || '', //количество в шт
-        description: parts.slice(4).join('\\\\') || '', // description
+    } else if (parts[0] === 'Ламинат') {
+      result = {
+        size: parts[1] || '',
+        thickness: parts[2] || '',
+        quantity: parts[3] || '',
+        description: parts.slice(4).join('\\\\') || '',
         type: 'Ламинат',
       };
-    }
-    // Если нет указания на тип покрытия, то это для плитки керамогранита
-    else {
-      return {
-        size: parts[0] || '', // Если size не указан, установите пустую строку
-        thickness: parts[1] || '', // Если thickness не указан, установите пустую строку
-        description: parts.slice(2).join('\\\\') || '', // Используем оставшуюся часть как description
+    } else {
+      result = {
+        size: parts[0] || '',
+        thickness: parts[1] || '',
+        description: parts.slice(2).join('\\\\') || '',
         type: 'Керамогранит',
       };
     }
-  }
-  // Если разделители отсутствуют, считаем, что описание относится к керамограниту
-  else {
-    return {
-      size: '', // пусто
-      thickness: '', // пусто
-      description: description, // весь текст как description
+  } else {
+    result = {
+      size: '',
+      thickness: '',
+      description: description,
       type: '',
     };
   }
+
+  if (characteristics) {
+    result.characteristics = characteristics;
+  }
+
+  return result;
 };
 
 // Функция для расчета площади на основе размера
@@ -182,6 +217,11 @@ const createProducts = async (
         continue;
       }
 
+      // проверка на деск и фото
+      if (!productData.description || (!productData.imageBase64?.trim() && !productData.imagesBase64?.length)) {
+        continue;
+      }
+
       // Проверяем, есть ли остатки только на складе 'Склад материалов (не для продажи)'
       const hasOnlyExcludedWarehouseStock = quantityDataArray.every((q) => {
         const stock = quantitiesStocks.find((qs) => qs.stockID === q.stockID);
@@ -235,19 +275,19 @@ const createProducts = async (
         const mainImageName = 'image_main.jpg';
         const mainImagePath = path.join(imageFolder, mainImageName);
         fs.writeFileSync(mainImagePath, productData.imageBase64, 'base64');
-        productImages.push(path.join('public/images/imagesProduct', productData.goodID, mainImageName));
+        productImages.push(path.join('/images/imagesProduct', productData.goodID, mainImageName));
       }
       if (productData.imagesBase64 && productData.imagesBase64.length > 0) {
         productData.imagesBase64.forEach((imageBase64, index) => {
           const imageName = `image${index + 1}.jpg`;
           const imagePath = path.join(imageFolder, imageName);
           fs.writeFileSync(imagePath, imageBase64, 'base64');
-          productImages.push(path.join('public/images/imagesProduct', productData.goodID, imageName));
+          productImages.push(path.join('/images/imagesProduct', productData.goodID, imageName));
         });
       }
 
       // Обрабатываем размеры и описание товара
-      const { size, thickness, description, type } = processDescription(productData.description);
+      const { size, thickness, description, type, characteristics } = processDescription(productData.description);
 
       // Пересчитываем цену, если это необходимо
       let recalculatedPrice = priceData.price;
@@ -329,6 +369,7 @@ const createProducts = async (
         description,
         originCountry: productData.originCountry,
         type: type ? type : '',
+        characteristics,
       });
 
       // Сохраняем продукт в базу данных
@@ -356,39 +397,48 @@ const createProducts = async (
 
 const createCategories = async (categoriesData: ICategoryFromApi[]): Promise<void> => {
   try {
-    // Шаг 1: Создаем категории, в которых есть товары
+    const createdCategories = new Set<string>(); // Храним уже созданные категории
+
     for (const categoryData of categoriesData) {
       const productsForCategory = await Product.find({ ownerID: categoryData.ID });
+
       if (productsForCategory.length > 0) {
-        const newCategory = new Category({
-          name: categoryData.name,
-          ID: categoryData.ID,
-          ownerID: categoryData.ownerID,
-          productsHave: true,
-        });
-        await newCategory.save();
-      }
-    }
-
-    // Шаг 2: Создаем вышестоящие категории
-    for (const categoryData of categoriesData) {
-      // Находим родительскую категорию
-      const ownerCategory = categoriesData.find((item) => item.ID === categoryData.ownerID);
-
-      // Проверяем, есть ли такая родительская категория и создана ли она
-      if (ownerCategory && !(await Category.exists({ ID: ownerCategory.ID }))) {
-        const newCategory = new Category({
-          name: ownerCategory.name,
-          ID: ownerCategory.ID,
-          ownerID: ownerCategory.ownerID,
-        });
-        await newCategory.save();
+        await createCategoryWithParents(categoryData, categoriesData, createdCategories);
       }
     }
 
     console.log('Все категории успешно созданы в базе данных.');
   } catch (error) {
     console.error('Ошибка при создании категорий:', error);
+  }
+};
+
+const createCategoryWithParents = async (
+  categoryData: ICategoryFromApi,
+  categoriesData: ICategoryFromApi[],
+  createdCategories: Set<string>,
+): Promise<void> => {
+  if (createdCategories.has(categoryData.ID)) return; // Если уже создана, выходим
+
+  // Если у категории есть родитель, сначала создаем его
+  if (categoryData.ownerID) {
+    const parentCategory = categoriesData.find((item) => item.ID === categoryData.ownerID);
+    if (parentCategory) {
+      await createCategoryWithParents(parentCategory, categoriesData, createdCategories);
+    }
+  }
+
+  // Проверяем, существует ли уже такая категория в БД
+  if (!(await Category.exists({ ID: categoryData.ID }))) {
+    const newCategory = new Category({
+      name: categoryData.name,
+      ID: categoryData.ID,
+      ownerID: categoryData.ownerID,
+      productsHave: !!(await Product.exists({ ownerID: categoryData.ID })), // true, если в категории есть товары
+    });
+
+    await newCategory.save();
+    createdCategories.add(categoryData.ID);
   }
 };
 
@@ -497,14 +547,11 @@ productFromApiRouter.get('/', async (req, res, next) => {
     const responsePrice = await fetchData('goods-price-get');
 
     const products: IProductFromApi[] = responseProducts.result.goods;
-
     const quantity = responseQuantity.result;
     const quantityGoods: IProductQuantityFromApi[] = quantity.goods;
     const quantityStocks: IProductQuantityStocksFromApi[] = quantity.stocks;
-
     const price: IProductPriceFromApi[] = responsePrice.result.goods;
     const priceName: IProductPriceNameFromApi[] = responsePrice.result.typesPrices;
-
     const categories: ICategoryFromApi[] = responseProducts.result.goodsGroups;
 
     await createProducts(products, price, priceName, quantityGoods, quantityStocks, categories);
