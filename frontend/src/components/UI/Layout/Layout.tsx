@@ -71,7 +71,7 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <Box sx={{ height: `${toolbarHeight}px` }} />
 
       {location.pathname !== '/' && (
-        <Box sx={{ background: toolbarTobAndBottomColor }}>
+        <Box sx={{ background: toolbarTobAndBottomColor, mt: 0.5 }}>
           <Container maxWidth={'xl'}>
             <BreadcrumbsPage />
           </Container>
@@ -103,13 +103,17 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
         {location.pathname === '/' && <ProductsNews />}
       </Container>
 
-      <Container maxWidth="xl" sx={{ mb: 2 }}>
-        {location.pathname === '/' && <ProductsSale />}
-      </Container>
+      {location.pathname === '/' && (
+        <Container maxWidth="xl" sx={{ mb: 2 }}>
+          <ProductsSale />
+        </Container>
+      )}
 
-      <Container maxWidth="xl" sx={{ mb: 2 }}>
-        {location.pathname === '/' && <Bestsellers />}
-      </Container>
+      {location.pathname === '/' && (
+        <Container maxWidth="xl" sx={{ mb: 2 }}>
+          <Bestsellers />
+        </Container>
+      )}
 
       {/* Футер */}
       <footer style={{ flexShrink: 0, marginTop: 'auto' }}>

@@ -4,7 +4,7 @@ import React from 'react';
 const Spinner = () => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-      <CircularProgress color="primary" thickness={6} />
+      <CircularProgress color="warning" thickness={6} />
     </Box>
   );
 };

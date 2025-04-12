@@ -50,6 +50,10 @@ export interface IProduct {
   thickness: string;
   originCountry: string;
   type: string;
+  characteristics: {
+    key: string;
+    value: string;
+  }[];
 }
 
 export interface IProductQuantityFromApi {

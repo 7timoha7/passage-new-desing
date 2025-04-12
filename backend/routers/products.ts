@@ -1,10 +1,11 @@
 import express from 'express';
 import Product from '../models/Product';
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 import auth, { RequestWithUser } from '../middleware/auth';
 import permit from '../middleware/permit';
 import { promises as fs } from 'fs';
 import Category from '../models/Category';
+import { IProduct } from '../types';
 
 const productRouter = express.Router();
 
@@ -58,17 +59,52 @@ productRouter.get('/', async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
     const pageSize = 20;
 
-    let query = {};
+    // interface MongoQuery {
+    //   [key: string]: any;
+    // }
+
+    const query: FilterQuery<IProduct> = {};
 
     if (req.query.category) {
       const categoryId = req.query.category as string;
       const finalCategories = await getAllFinalCategories(categoryId);
+      query.ownerID = { $in: finalCategories };
+    }
 
-      query = { ownerID: { $in: finalCategories } };
+    const filtersRaw = req.query.filters as string;
+    if (filtersRaw) {
+      const filters = JSON.parse(filtersRaw);
+      const filterConditions = [];
+
+      for (const [key, value] of Object.entries(filters)) {
+        if (Array.isArray(value)) {
+          filterConditions.push({
+            characteristics: {
+              $elemMatch: {
+                key,
+                value: { $in: value },
+              },
+            },
+          });
+        } else {
+          filterConditions.push({
+            characteristics: {
+              $elemMatch: {
+                key,
+                value,
+              },
+            },
+          });
+        }
+      }
+
+      if (filterConditions.length > 0) {
+        query.$and = filterConditions;
+      }
     }
 
     const sortParam = req.query.sort as string;
-    let sort: Record<string, 1 | -1>;
+    let sort: Record<string, 1 | -1> = {};
 
     switch (sortParam) {
       case 'price_asc':
@@ -84,17 +120,15 @@ productRouter.get('/', async (req, res) => {
         sort = { name: -1 };
         break;
       case 'newest':
-        sort = { article: -1 }; // предполагаем, что новые товары имеют больший артикул
+        sort = { article: -1 };
         break;
-      default:
-        sort = {}; // без сортировки
     }
 
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / pageSize);
 
     const products = await Product.find(query)
-      .sort(sort) // добавили сортировку
+      .sort(sort)
       .skip((page - 1) * pageSize)
       .limit(pageSize);
 
@@ -110,6 +144,44 @@ productRouter.get('/', async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.sendStatus(500);
+  }
+});
+
+productRouter.get('/filters', async (req, res) => {
+  try {
+    const categoryId = req.query.category as string;
+    if (!categoryId) {
+      return res.status(400).send({ message: 'category is required' });
+    }
+
+    // получаем все финальные категории
+    const finalCategories = await getAllFinalCategories(categoryId);
+
+    // находим все товары в этих категориях
+    const products = await Product.find({ ownerID: { $in: finalCategories } }, 'characteristics');
+
+    // собираем все characteristics
+    const filterMap = new Map<string, Set<string>>();
+
+    products.forEach((product) => {
+      product.characteristics.forEach(({ key, value }) => {
+        if (!filterMap.has(key)) {
+          filterMap.set(key, new Set());
+        }
+        filterMap.get(key)?.add(value);
+      });
+    });
+
+    // преобразуем в массив
+    const filters = Array.from(filterMap.entries()).map(([key, values]) => ({
+      key,
+      values: Array.from(values).sort(),
+    }));
+
+    res.send({ filters });
+  } catch (error) {
+    console.error('Error in /products/filters:', error);
+    res.sendStatus(500);
   }
 });
 

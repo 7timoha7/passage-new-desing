@@ -50,52 +50,28 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
 
   isoCountries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
   const countryName = isoCountries.getName(product.originCountry, 'ru');
+  const isoCountryCode = countryName ? isoCountries.getAlpha2Code(countryName, 'ru') : undefined;
 
-  let isoCountryCode: string | undefined = '';
-
-  if (countryName != null) {
-    isoCountryCode = isoCountries.getAlpha2Code(countryName, 'ru');
-  }
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   const indicator = (item: ProductType) => {
-    if (basket && item) {
-      return basket?.items?.some((itemBasket) => itemBasket.product.goodID === item.goodID);
-    } else {
-      return false;
-    }
+    return basket?.items?.some((itemBasket) => itemBasket.product.goodID === item.goodID) ?? false;
   };
 
   const handleAddToCart = async () => {
-    if (storedBasketId) {
-      await dispatch(
-        updateBasket({
-          sessionKey: storedBasketId,
-          product_id: product.goodID,
-          action: 'increase',
-        }),
-      );
-      await dispatch(fetchBasket(storedBasketId));
-    } else if (user) {
-      await dispatch(
-        updateBasket({
-          sessionKey: '1',
-          product_id: product.goodID,
-          action: 'increase',
-        }),
-      );
-      await dispatch(fetchBasket('1'));
-    }
+    const sessionKey = storedBasketId || '1';
+    await dispatch(updateBasket({ sessionKey, product_id: product.goodID, action: 'increase' }));
+    await dispatch(fetchBasket(sessionKey));
   };
 
   const onClickFavorite = async (id: string) => {
     if (!favorite) {
       await dispatch(changeFavorites({ addProduct: id }));
-      await dispatch(reAuthorization());
     } else {
       await dispatch(changeFavorites({ deleteProduct: id }));
-      await dispatch(reAuthorization());
       await dispatch(getFavoriteProducts(1));
     }
+    await dispatch(reAuthorization());
   };
 
   const favorite =
@@ -110,20 +86,14 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
     <Box sx={{ mt: 2 }}>
       <Box sx={{ maxWidth: '100%', margin: 'auto', position: 'relative' }}>
         <Box
-          sx={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            cursor: 'pointer',
-          }}
+          sx={{ position: 'absolute', top: '16px', right: '16px', cursor: 'pointer' }}
           onClick={(e) => {
             e.stopPropagation();
             onClickFavorite(product.goodID);
           }}
         >
-          {user &&
-            user.isVerified &&
-            (user.role === 'user' || user.role === 'director' || user.role === 'admin') &&
+          {user?.isVerified &&
+            ['user', 'director', 'admin'].includes(user.role) &&
             (favorite ? (
               favoriteLoading === product.goodID ? (
                 <CircularProgress size={'20px'} color="error" />
@@ -136,130 +106,90 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
               <FavoriteBorderIcon />
             ))}
         </Box>
+
         <Grid
           container
           spacing={2}
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '40% 60%' }, // 40% картинка, 60% инфа
+            gridTemplateColumns: { xs: '1fr', md: '40% 60%' },
             gap: 2,
           }}
         >
-          {/* Левая часть - изображение */}
+          {/* Левая часть */}
           <Grid item>
-            <Box>
-              {product.images.length ? (
-                <ProductGallery images={product.images} />
-              ) : (
-                <LazyLoadImage
-                  src={noImage}
-                  alt={product.name}
-                  width="100%"
-                  height="200px"
-                  effect="blur"
-                  placeholderSrc={placeHolderImg}
-                  style={{ objectFit: 'contain' }}
-                />
-              )}
-            </Box>
+            {product.images.length ? (
+              <ProductGallery images={product.images} />
+            ) : (
+              <LazyLoadImage
+                src={noImage}
+                alt={product.name}
+                width="100%"
+                height="200px"
+                effect="blur"
+                placeholderSrc={placeHolderImg}
+                style={{ objectFit: 'contain' }}
+              />
+            )}
           </Grid>
 
-          {/* Правая часть - информация */}
-          <Grid
-            item
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            {/* Описание */}
+          {/* Правая часть */}
+          <Grid item sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="h4" gutterBottom>
                 {product.name}
               </Typography>
             </Box>
 
-            {/* Кнопки и цена*/}
+            {/* Цена и кнопки */}
             <Box sx={{ background: 'rgba(245,245,245,0.73)', borderRadius: '10px', padding: '18px' }}>
               <Box sx={{ mb: 2 }}>
                 {product.priceSale > 0 && (
-                  <Box>
-                    <Typography sx={{ color: priceColorFullCard, mt: 1, textDecoration: 'line-through' }}>
-                      {product.priceSale + ' сом'}
-                      {product.type === 'Керамогранит' ? (
+                  <>
+                    <Typography sx={{ color: priceColorFullCard, textDecoration: 'line-through' }}>
+                      {product.priceSale} сом
+                      {product.type === 'Керамогранит' && (
                         <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за плитку</span>
-                      ) : (
-                        ''
                       )}
-                      {product.type === 'Ковролин' ? (
-                        <span
-                          style={{
-                            color: priceNameColorFullCard,
-                            fontSize: '15px',
-                          }}
-                        >
+                      {product.type === 'Ковролин' && (
+                        <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}>
                           {' '}
                           - минимально за {product.size} м²
                         </span>
-                      ) : (
-                        ''
                       )}
                     </Typography>
-
-                    {product.type === 'Керамогранит' &&
-                    (product.measureName === 'м2' || product.measureName === 'm2') ? (
+                    {(product.type === 'Ковролин' ||
+                      (product.type === 'Керамогранит' &&
+                        (product.measureName === 'м2' || product.measureName === 'm2'))) && (
                       <Typography sx={{ color: priceColorFullCard, textDecoration: 'line-through' }}>
-                        {product.priceOriginalSale + ' сом'}
+                        {product.priceOriginalSale} сом
                         <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за м²</span>
                       </Typography>
-                    ) : null}
-
-                    {product.type === 'Ковролин' ? (
-                      <Typography sx={{ color: priceColorFullCard, textDecoration: 'line-through' }}>
-                        {product.priceOriginalSale + ' сом'}
-                        <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за м²</span>
-                      </Typography>
-                    ) : null}
-                  </Box>
+                    )}
+                  </>
                 )}
 
-                <Box>
-                  <Typography sx={{ color: priceColorFullCard, mt: 1 }}>
-                    {product.price + ' сом'}
-                    {product.type === 'Керамогранит' ? (
-                      <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за плитку</span>
-                    ) : (
-                      ''
-                    )}
-                    {product.type === 'Ковролин' ? (
-                      <span
-                        style={{
-                          color: priceNameColorFullCard,
-                          fontSize: '15px',
-                        }}
-                      >
-                        {' '}
-                        - минимально за {product.size} м²
-                      </span>
-                    ) : (
-                      ''
-                    )}
+                <Typography sx={{ color: priceColorFullCard, mt: 1 }}>
+                  {product.price} сом
+                  {product.type === 'Керамогранит' && (
+                    <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за плитку</span>
+                  )}
+                  {product.type === 'Ковролин' && (
+                    <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}>
+                      {' '}
+                      - минимально за {product.size} м²
+                    </span>
+                  )}
+                </Typography>
+
+                {(product.type === 'Ковролин' ||
+                  (product.type === 'Керамогранит' &&
+                    (product.measureName === 'м2' || product.measureName === 'm2'))) && (
+                  <Typography sx={{ color: priceColorFullCard }}>
+                    {product.priceOriginal} сом
+                    <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за м²</span>
                   </Typography>
-
-                  {product.type === 'Керамогранит' && (product.measureName === 'м2' || product.measureName === 'm2') ? (
-                    <Typography sx={{ color: priceColorFullCard }}>
-                      {product.priceOriginal + ' сом'}
-                      <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за м²</span>
-                    </Typography>
-                  ) : null}
-
-                  {product.type === 'Ковролин' ? (
-                    <Typography sx={{ color: priceColorFullCard }}>
-                      {product.priceOriginal + ' сом'}
-                      <span style={{ color: priceNameColorFullCard, fontSize: '15px' }}> - за м²</span>
-                    </Typography>
-                  ) : null}
-                </Box>
+                )}
               </Box>
 
               <Grid container gap={2}>
@@ -284,6 +214,8 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
                 </Grid>
               </Grid>
             </Box>
+
+            {/* Таблица характеристик */}
             <Box mt={4}>
               <Typography variant="h6" gutterBottom>
                 Информация о товаре
@@ -303,54 +235,62 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
                       </TableCell>
                       <TableCell>{product.measureName}</TableCell>
                     </TableRow>
+
                     {product.size && product.thickness && (
                       <TableRow>
                         <TableCell component="th" scope="row">
                           Размер:
                         </TableCell>
                         <TableCell>
-                          <Box>
-                            <Typography variant={'caption'}>Ширина/высота(см): {product.size}</Typography>
-                          </Box>
-                          <Box>
-                            <Typography variant={'caption'}>Толщина(мм): {product.thickness}</Typography>
-                          </Box>
+                          <Typography variant="caption">Ширина/высота(см): {product.size}</Typography>
+                          <br />
+                          <Typography variant="caption">Толщина(мм): {product.thickness}</Typography>
                         </TableCell>
                       </TableRow>
                     )}
+
+                    {product.characteristics
+                      .filter((item) => {
+                        return !(product.size && item.key.trim().toLowerCase() === 'размер');
+                      })
+                      .map((item) => (
+                        <TableRow key={item.key + item.value}>
+                          <TableCell component="th" scope="row">
+                            {capitalize(item.key.trim())}:
+                          </TableCell>
+                          <TableCell>{item.value}</TableCell>
+                        </TableRow>
+                      ))}
 
                     <TableRow>
                       <TableCell component="th" scope="row">
                         Наличие:
                       </TableCell>
                       <TableCell>
-                        {user && (user.role === 'admin' || user.role === 'director') ? (
+                        {user && ['admin', 'director'].includes(user.role) ? (
                           <>
                             {product.quantity.map((stock, index) => (
-                              <Box key={stock.stockID + index}>
-                                <Typography variant={'caption'}>
-                                  {stock.name}: <span style={{ fontWeight: 'bold' }}>{stock.quantity}</span>
-                                </Typography>
-                              </Box>
+                              <Typography variant="caption" key={stock.stockID + index}>
+                                {stock.name}: <strong>{stock.quantity}</strong>
+                              </Typography>
                             ))}
                           </>
                         ) : (
-                          <Typography variant={'caption'} color={'green'}>
+                          <Typography variant="caption" color="green">
                             В наличии
                           </Typography>
                         )}
                       </TableCell>
                     </TableRow>
+
                     {product.originCountry && (
                       <TableRow>
                         <TableCell component="th" scope="row">
                           Страна производитель:
                         </TableCell>
                         <TableCell>
-                          <Grid container spacing={2} alignItems={'center'}>
-                            <Grid item sx={{ mt: '3px' }}>
-                              {countryName && <Typography>{countryName}</Typography>}
-                            </Grid>
+                          <Grid container spacing={2} alignItems="center">
+                            <Grid item>{countryName && <Typography>{countryName}</Typography>}</Grid>
                             <Grid item>
                               {isoCountryCode && (
                                 <CountryFlag
@@ -369,6 +309,7 @@ const ProductFullCard: React.FC<Props> = ({ product }) => {
                         </TableCell>
                       </TableRow>
                     )}
+
                     <TableRow>
                       <TableCell component="th" scope="row">
                         Артикул:

@@ -180,7 +180,7 @@ const CustomSearchBar: React.FC = () => {
                   sx={{
                     color: '#e39912', // Цвет контура кнопки
                     '&:hover': {
-                      color: '#ffffff', // Цвет контура кнопки при наведении
+                      color: '#000000', // Цвет контура кнопки при наведении
                     },
                   }}
                   onClick={handleExtendedSearch}

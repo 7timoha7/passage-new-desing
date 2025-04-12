@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
+  FilterOptionType,
   GlobalSuccess,
   PageInfo,
   ProductsSearchPreview,
@@ -13,12 +14,13 @@ import { isAxiosError } from 'axios';
 
 export const productsFetch = createAsyncThunk<
   { products: ProductType[]; pageInfo: PageInfo },
-  { id: string; page: number; sort?: string }
->('products/fetch', async ({ id, page, sort }) => {
+  { id: string; page: number; sort?: string; filters?: Record<string, string[]> }
+>('products/fetch', async ({ id, page, sort, filters }) => {
   const params = new URLSearchParams();
   params.append('category', id);
   params.append('page', page.toString());
   if (sort) params.append('sort', sort);
+  if (filters) params.append('filters', JSON.stringify(filters)); // 👈 сериализуем фильтры
 
   const response = await axiosApi.get(`/products?${params.toString()}`);
   return response.data;
@@ -132,5 +134,13 @@ export const searchProductsPreview = createAsyncThunk<ProductsSearchPreview, { t
     } catch {
       throw new Error();
     }
+  },
+);
+
+export const fetchProductFilters = createAsyncThunk<FilterOptionType[], string>(
+  'products/fetchFilters',
+  async (categoryId) => {
+    const response = await axiosApi.get<{ filters: FilterOptionType[] }>(`/products/filters?category=${categoryId}`);
+    return response.data.filters;
   },
 );

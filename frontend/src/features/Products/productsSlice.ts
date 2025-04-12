@@ -1,8 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { GlobalSuccess, PageInfo, ProductsSearchPreview, ProductType, ValidationError } from '../../types';
+import {
+  FilterOptionType,
+  GlobalSuccess,
+  PageInfo,
+  ProductsSearchPreview,
+  ProductType,
+  ValidationError,
+} from '../../types';
 import { RootState } from '../../app/store';
 import {
   editProduct,
+  fetchProductFilters,
   getFavoriteProducts,
   productFetch,
   productsFetch,
@@ -33,6 +41,8 @@ interface ProductsState {
   searchLoadingPreview: boolean;
   productsNews: ProductType[];
   productsNewsLoading: boolean;
+  filterOption: FilterOptionType[];
+  filterOptionLoading: boolean;
 }
 
 const initialState: ProductsState = {
@@ -56,6 +66,8 @@ const initialState: ProductsState = {
   searchLoadingPreview: false,
   productsNews: [],
   productsNewsLoading: false,
+  filterOption: [],
+  filterOptionLoading: false,
 };
 
 export const productsSLice = createSlice({
@@ -173,6 +185,18 @@ export const productsSLice = createSlice({
       state.searchLoadingPreview = false;
       state.error = true;
     });
+
+    builder.addCase(fetchProductFilters.pending, (state) => {
+      state.filterOptionLoading = true;
+    });
+    builder.addCase(fetchProductFilters.fulfilled, (state, action) => {
+      state.filterOption = action.payload;
+      state.filterOptionLoading = false;
+    });
+    builder.addCase(fetchProductFilters.rejected, (state) => {
+      state.filterOptionLoading = false;
+      state.error = true;
+    });
   },
 });
 
@@ -200,3 +224,5 @@ export const selectSearchResultsPreview = (state: RootState) => state.products.s
 export const selectSearchLoadingPreview = (state: RootState) => state.products.searchLoadingPreview;
 export const selectProductsNews = (state: RootState) => state.products.productsNews;
 export const selectProductsNewsLoading = (state: RootState) => state.products.productsNewsLoading;
+export const selectFilterOption = (state: RootState) => state.products.filterOption;
+export const selectFilterOptionLoading = (state: RootState) => state.products.filterOptionLoading;

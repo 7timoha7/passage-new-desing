@@ -75,50 +75,85 @@ const run = async () => {
     description: string;
     type: string;
     quantity?: string;
+    characteristics?: { key: string; value: string }[];
   } => {
-    // Разделяем строку по разделителю "\\" и удаляем пробелы
-    const parts = description.split('\\\\').map((part) => part.trim());
+    let characteristics: { key: string; value: string }[] | undefined;
 
-    // Если разделители присутствуют, используем их для определения size, thickness и description
+    // Извлекаем блок { ... }, включая переносы строк и запятые
+    const match = description.match(/{([\s\S]*?)}/);
+
+    if (match) {
+      const rawBlock = match[1];
+
+      characteristics = rawBlock
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.includes(':'))
+        .map((line) => {
+          // Убираем лишние запятые и пробелы
+          const [key, ...rest] = line.replace(/,$/, '').split(':');
+          return {
+            key: key.trim(),
+            value: rest.join(':').trim(),
+          };
+        });
+
+      // Удаляем блок характеристик из исходного описания
+      description = description.replace(match[0], '').trim();
+    }
+
+    const parts = description
+      .split('\\\\')
+      .map((part) => part.trim())
+      .filter((part) => part !== '');
+
+    let result: {
+      size: string;
+      thickness: string;
+      description: string;
+      type: string;
+      quantity?: string;
+      characteristics?: { key: string; value: string }[];
+    };
+
     if (parts.length > 1) {
-      // Если первая часть строки точно соответствует "Ковролин\\"
       if (parts[0] === 'Ковролин') {
-        return {
-          size: parts[1] || '', // size
-          thickness: '', // Для Ковролина толщина не указывается
-          description: parts.slice(2).join('\\\\') || '', // description
+        result = {
+          size: parts[1] || '',
+          thickness: '',
+          description: parts.slice(2).join('\\\\') || '',
           type: 'Ковролин',
         };
-      }
-      // Если первая часть строки точно соответствует "Ламинат\\"
-      else if (parts[0] === 'Ламинат') {
-        return {
-          size: parts[1] || '', // size
-          thickness: parts[2] || '', // thickness
-          quantity: parts[3] || '', //количество в шт
-          description: parts.slice(4).join('\\\\') || '', // description
+      } else if (parts[0] === 'Ламинат') {
+        result = {
+          size: parts[1] || '',
+          thickness: parts[2] || '',
+          quantity: parts[3] || '',
+          description: parts.slice(4).join('\\\\') || '',
           type: 'Ламинат',
         };
-      }
-      // Если нет указания на тип покрытия, то это для плитки керамогранита
-      else {
-        return {
-          size: parts[0] || '', // Если size не указан, установите пустую строку
-          thickness: parts[1] || '', // Если thickness не указан, установите пустую строку
-          description: parts.slice(2).join('\\\\') || '', // Используем оставшуюся часть как description
+      } else {
+        result = {
+          size: parts[0] || '',
+          thickness: parts[1] || '',
+          description: parts.slice(2).join('\\\\') || '',
           type: 'Керамогранит',
         };
       }
-    }
-    // Если разделители отсутствуют, считаем, что описание относится к керамограниту
-    else {
-      return {
-        size: '', // пусто
-        thickness: '', // пусто
-        description: description, // весь текст как description
+    } else {
+      result = {
+        size: '',
+        thickness: '',
+        description: description,
         type: '',
       };
     }
+
+    if (characteristics) {
+      result.characteristics = characteristics;
+    }
+
+    return result;
   };
 
   // Функция для расчета площади на основе размера
@@ -257,7 +292,7 @@ const run = async () => {
         }
 
         // Обрабатываем размеры и описание товара
-        const { size, thickness, description, type } = processDescription(productData.description);
+        const { size, thickness, description, type, characteristics } = processDescription(productData.description);
 
         // Пересчитываем цену, если это необходимо
         let recalculatedPrice = priceData.price;
@@ -339,6 +374,7 @@ const run = async () => {
           description,
           originCountry: productData.originCountry,
           type: type ? type : '',
+          characteristics,
         });
 
         // Сохраняем продукт в базу данных
@@ -504,12 +540,10 @@ const run = async () => {
 
   console.log('start - loading data...');
   const responseProducts = await fetchData('goods-get');
-  console.log('777777   ' + responseProducts);
-  JSON.stringify(console.log('777777   ' + responseProducts));
   const responseQuantity = await fetchData('goods-quantity-get');
   const responsePrice = await fetchData('goods-price-get');
 
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
   // Вместо ожидания результата запроса, сохраняем его в переменную
   const goodsData = await fetchData('goods-get');
 

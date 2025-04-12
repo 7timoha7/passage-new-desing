@@ -81,6 +81,21 @@ const ProductSchema = new Schema<IProduct>({
     type: String,
     default: '',
   },
+  characteristics: {
+    type: [
+      {
+        key: {
+          type: String,
+          required: true,
+        },
+        value: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    default: [],
+  },
 });
 
 const Product = mongoose.model('Product', ProductSchema);

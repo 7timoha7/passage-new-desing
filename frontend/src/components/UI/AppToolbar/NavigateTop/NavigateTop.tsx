@@ -127,7 +127,12 @@ const NavigateTop: React.FC = () => {
             <LinkTel />
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Button sx={ToolBarTopTextSearchBasket} color="inherit">
+              <Button
+                ref={searchButtonRef}
+                onClick={() => setSearchOpen((prev) => !prev)}
+                sx={ToolBarTopTextSearchBasket}
+                color="inherit"
+              >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <SearchIcon fontSize={'medium'} />
                   <p style={{ fontSize: '9px', margin: 0, padding: 0 }}>Поиск</p>
@@ -149,7 +154,11 @@ const NavigateTop: React.FC = () => {
           </Link>
 
           <Box display="flex" alignItems="center" gap={1}>
-            <IconButton sx={ToolBarTopTextSearchBasket} onClick={() => setSearchOpen((prev) => !prev)}>
+            <IconButton
+              ref={searchButtonRef}
+              sx={ToolBarTopTextSearchBasket}
+              onClick={() => setSearchOpen((prev) => !prev)}
+            >
               <SearchIcon />
             </IconButton>
 

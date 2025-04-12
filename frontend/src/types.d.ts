@@ -80,6 +80,15 @@ export interface ProductType {
   thickness: string;
   originCountry: string;
   type: string;
+  characteristics: {
+    key: string;
+    value: string;
+  }[];
+}
+
+export interface FilterOptionType {
+  key: string;
+  values: string[];
 }
 
 export interface ImgType {
