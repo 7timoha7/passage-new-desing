@@ -1,6 +1,8 @@
 import img1 from '../../../assets/images/logoAbout/rak.png';
 import img2 from '../../../assets/images/logoAbout/kludi.png';
 import img3 from '../../../assets/images/logoAbout/porcelain.png';
+import img4 from '../../../assets/images/logoAbout/cascade.svg';
+
 import { Box, CardMedia, Grid, Typography, useMediaQuery, Card } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +11,7 @@ const images = [
   { src: img1, path: '/about/rakceramics' },
   { src: img2, path: '/about/kludirak' },
   { src: img3, path: '/about/rakporcelain' },
+  { src: img4, path: '/about/cascade' },
 ];
 
 const getCardStyles = () => ({

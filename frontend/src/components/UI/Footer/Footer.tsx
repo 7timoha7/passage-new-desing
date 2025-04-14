@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Box, Container, Grid, Link, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Box, Container, Divider, Grid, Link, Typography, useMediaQuery } from '@mui/material';
 import CallIcon from '@mui/icons-material/Call';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -156,7 +156,7 @@ const Footer = () => {
               </Grid>
             </Grid>
           </Grid>
-          {/*<Divider sx={{ border: '1px solid #3f3f3f', position: 'absolute', left: 0, right: 0 }} />*/}
+          <Divider sx={{ border: '1px solid #3f3f3f', position: 'absolute', left: 0, right: 0 }} />
 
           {/*<Typography sx={{ pt: 1, textAlign: 'center', fontSize: '12px' }}>*/}
           {/*  <Link*/}
@@ -173,6 +173,22 @@ const Footer = () => {
           {/*    Разработчик проекта: Маркелов Артем*/}
           {/*  </Link>*/}
           {/*</Typography>*/}
+
+          <Typography sx={{ pt: 1, textAlign: 'center', fontSize: '12px' }}>
+            <Link
+              sx={{
+                textDecoration: 'none',
+                color: '#FFFFFF',
+                '&:hover': { color: '#ad882c' },
+              }}
+              href="/privacyPolicy"
+              color="inherit"
+              target="_blank"
+              // rel="noopener noreferrer"
+            >
+              Политика конфиденциальности
+            </Link>
+          </Typography>
         </Container>
       </AppBar>
     </Box>

@@ -50,6 +50,8 @@ import Rakporcelain from './components/UI/AboutPage/Rakporcelain';
 import { selectDesignerSuccess } from './components/UI/AppToolbar/NavigateTop/Components/ForClients/ForUsers/Designers/designersSlice';
 import GetADiscount from './features/GetADiscount/components/GetADiscount';
 import Discounts from './features/GetADiscount/components/Discounts';
+import Cascade from './components/UI/AboutPage/Cascade';
+import PrivacyPolicy from './components/UI/PrivacyPolicy/PrivacyPolicy';
 
 function App() {
   const user = useAppSelector(selectUser);
@@ -267,6 +269,8 @@ function App() {
         <Route path="about/rakceramics/" element={<Rakceramics />} />
         <Route path="about/kludirak/" element={<Kludirak />} />
         <Route path="about/rakporcelain/" element={<Rakporcelain />} />
+        <Route path="about/cascade/" element={<Cascade />} />
+        <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
         <Route path="get-a-discount" element={<GetADiscount />} />
         <Route path="list-of-discounts" element={<Discounts />} />
         <Route
