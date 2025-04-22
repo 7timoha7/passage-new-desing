@@ -154,31 +154,39 @@ const Products: React.FC<Props> = ({ categoryName }) => {
           <Typography textTransform="uppercase" variant="subtitle2" fontWeight="bold" mb={1}>
             {filter.key}
           </Typography>
-          <Stack>
-            {filter.values.map((value) => (
-              <FormControlLabel
-                key={value}
-                control={
-                  <Checkbox
-                    sx={{
-                      color: orange[800],
-                      '&.Mui-checked': {
-                        color: orange[600],
-                      },
-                    }}
-                    size="small"
-                    checked={selectedFilters[filter.key]?.includes(value) || false}
-                    onChange={() => handleFilterChange(filter.key, value)}
-                  />
-                }
-                label={
-                  <Typography textTransform="uppercase" variant="body2">
-                    {value}
-                  </Typography>
-                }
-              />
-            ))}
-          </Stack>
+          <Box
+            sx={{
+              maxHeight: 400,
+              overflowY: 'auto',
+              pr: 1,
+            }}
+          >
+            <Stack>
+              {filter.values.map((value) => (
+                <FormControlLabel
+                  key={value}
+                  control={
+                    <Checkbox
+                      sx={{
+                        color: orange[800],
+                        '&.Mui-checked': {
+                          color: orange[600],
+                        },
+                      }}
+                      size="small"
+                      checked={selectedFilters[filter.key]?.includes(value) || false}
+                      onChange={() => handleFilterChange(filter.key, value)}
+                    />
+                  }
+                  label={
+                    <Typography textTransform="uppercase" variant="body2">
+                      {value}
+                    </Typography>
+                  }
+                />
+              ))}
+            </Stack>
+          </Box>
         </Box>
       ))}
       <Box mt={3}>
