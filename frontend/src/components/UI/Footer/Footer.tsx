@@ -183,7 +183,7 @@ const Footer = () => {
               }}
               href="/privacyPolicy"
               color="inherit"
-              target="_blank"
+              // target="_blank"
               // rel="noopener noreferrer"
             >
               Политика конфиденциальности
