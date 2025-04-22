@@ -156,7 +156,7 @@ const Products: React.FC<Props> = ({ categoryName }) => {
           </Typography>
           <Box
             sx={{
-              maxHeight: 400,
+              maxHeight: 401,
               overflowY: 'auto',
               pr: 1,
             }}
