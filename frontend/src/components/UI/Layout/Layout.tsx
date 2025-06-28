@@ -11,7 +11,6 @@ import Bestsellers from '../../../features/Bestsellers/Bestsellers';
 import ProductsNews from '../../../features/Products/components/ProductsNews';
 import ProductsFor from '../../../features/ProductsFor/components/ProductsFor';
 import BannerTop from '../../../features/Banners/BannerTop';
-import CategoriesMainPage from '../../../features/MenuCategories/components/CategoriesMainPage';
 import ProductsSale from '../../../features/ProductsSale/ProductsSale';
 import { toolbarTobAndBottomColor } from '../../../styles';
 import BreadcrumbsPage from '../BreadcrumbsPage/BreadcrumbsPage';
@@ -92,11 +91,11 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
         </Box>
       </Container>
 
-      {location.pathname === '/' && (
-        <Container maxWidth="xl" sx={{ mb: 2 }}>
-          <CategoriesMainPage />
-        </Container>
-      )}
+      {/*{location.pathname === '/' && (*/}
+      {/*  <Container maxWidth="xl" sx={{ mb: 2 }}>*/}
+      {/*    <CategoriesMainPage />*/}
+      {/*  </Container>*/}
+      {/*)}*/}
 
       <Container maxWidth="xl" sx={{ mb: 2 }}>
         {location.pathname.includes('/product/') && productsForID && <ProductsFor categoriesID={productsForID} />}
