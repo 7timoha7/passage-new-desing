@@ -86,11 +86,11 @@ const ProductSchema = new Schema<IProduct>({
       {
         key: {
           type: String,
-          required: true,
+          // required: true,
         },
         value: {
           type: String,
-          required: true,
+          // required: true,
         },
       },
     ],

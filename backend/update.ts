@@ -25,7 +25,7 @@ const run = async () => {
   const db = mongoose.connection;
 
   const fetchData = async (method: string) => {
-    const apiUrl = 'http://95.215.244.110/edo/hs/ext_api/execute';
+    const apiUrl = 'http://185.138.185.19/edo/hs/ext_api/execute';
     const username = 'AUTH_TOKEN';
     const password = 'jU5gujas';
 
@@ -220,9 +220,9 @@ const run = async () => {
         }
 
         // проверка на деск и фото
-        if (!productData.description || (!productData.imageBase64?.trim() && !productData.imagesBase64?.length)) {
-          continue;
-        }
+        // if (!productData.description || (!productData.imageBase64?.trim() && !productData.imagesBase64?.length)) {
+        //   continue;
+        // }
 
         // Проверяем, есть ли остатки только на складе 'Склад материалов (не для продажи)'
         const hasOnlyExcludedWarehouseStock = quantityDataArray.every((q) => {
