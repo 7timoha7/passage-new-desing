@@ -24,46 +24,47 @@ const run = async () => {
   await mongoose.connect(config.db);
   const db = mongoose.connection;
 
-  const fetchData = async (method: string) => {
+  const fetchAndSaveToFile = async (method: string, filePath: string) => {
     const apiUrl = 'http://185.138.185.19/edo/hs/ext_api/execute';
     const username = 'AUTH_TOKEN';
     const password = 'jU5gujas';
 
-    try {
-      const response = await axios.post(
-        apiUrl,
-        {
-          auth: {
-            clientID: 'c02c593e-4c90-11ee-813c-005056b73475',
-          },
-          general: {
-            method,
-            deviceID: '00000001-0001-0001-0001-000000015945',
-          },
+    const response = await axios.post(
+      apiUrl,
+      {
+        auth: {
+          clientID: 'c02c593e-4c90-11ee-813c-005056b73475',
         },
-        {
-          timeout: 300000,
-          headers: {
-            Authorization: `Basic ${Buffer.from(`${username}:${password}`, 'utf-8').toString('base64')}`,
-            configName: 'AUTHORIZATION',
-            configVersion: 'Basic Auth',
-          },
+        general: {
+          method,
+          deviceID: '00000001-0001-0001-0001-000000015945',
         },
-      );
+      },
+      {
+        responseType: 'stream',
+        timeout: 0,
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+          configName: 'AUTHORIZATION',        // 🔥 ВЕРНУЛИ
+          configVersion: 'Basic Auth',        // 🔥 ВЕРНУЛИ
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      },
+    );
 
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.code === 'ETIMEDOUT') {
-          console.error('Превышен таймаут при выполнении запроса:', error);
-        } else {
-          console.error('Ошибка при выполнении запроса:', error.message, error.response?.data);
-        }
-      } else {
-        console.error('Не удалось выполнить запрос:', error);
-      }
-      throw error;
-    }
+    const writer = fs.createWriteStream(filePath);
+
+    return new Promise((resolve, reject) => {
+      response.data.pipe(writer);
+
+      writer.on('finish', () => {
+        console.log(`Файл сохранен: ${filePath}`);
+        resolve(true);
+      });
+
+      writer.on('error', reject);
+    });
   };
 
   // Функция для обработки строки description и извлечения размера, толщины и описания
@@ -271,7 +272,7 @@ const run = async () => {
         // Создаем папку для изображений товара, если они есть
         const imageFolder = path.join(process.cwd(), 'public/images/imagesProduct', productData.goodID);
         if ((productData.imageBase64 || productData.imagesBase64.length > 0) && !fs.existsSync(imageFolder)) {
-          fs.mkdirSync(imageFolder, { recursive: true });
+          fs.mkdirSync(imageFolder, {recursive: true});
         }
 
         // Обрабатываем изображения товара
@@ -292,7 +293,7 @@ const run = async () => {
         }
 
         // Обрабатываем размеры и описание товара
-        const { size, thickness, description, type, characteristics } = processDescription(productData.description);
+        const {size, thickness, description, type, characteristics} = processDescription(productData.description);
 
         // Пересчитываем цену, если это необходимо
         let recalculatedPrice = priceData.price;
@@ -386,8 +387,8 @@ const run = async () => {
       await Product.bulkWrite(
         updatedProducts.map((product) => ({
           updateOne: {
-            filter: { _id: product._id },
-            update: { $set: { images: product.images } },
+            filter: {_id: product._id},
+            update: {$set: {images: product.images}},
           },
         })),
       );
@@ -405,7 +406,7 @@ const run = async () => {
       const createdCategories = new Set<string>(); // Храним уже созданные категории
 
       for (const categoryData of categoriesData) {
-        const productsForCategory = await Product.find({ ownerID: categoryData.ID });
+        const productsForCategory = await Product.find({ownerID: categoryData.ID});
 
         if (productsForCategory.length > 0) {
           await createCategoryWithParents(categoryData, categoriesData, createdCategories);
@@ -434,12 +435,12 @@ const run = async () => {
     }
 
     // Проверяем, существует ли уже такая категория в БД
-    if (!(await Category.exists({ ID: categoryData.ID }))) {
+    if (!(await Category.exists({ID: categoryData.ID}))) {
       const newCategory = new Category({
         name: categoryData.name,
         ID: categoryData.ID,
         ownerID: categoryData.ownerID,
-        productsHave: !!(await Product.exists({ ownerID: categoryData.ID })), // true, если в категории есть товары
+        productsHave: !!(await Product.exists({ownerID: categoryData.ID})), // true, если в категории есть товары
       });
 
       await newCategory.save();
@@ -479,7 +480,7 @@ const run = async () => {
   ////////////////////////
   const cleanUpDatabase = async () => {
     // Получаем список всех существующих товаров
-    const existingProducts = new Set((await Product.find({}, { goodID: 1 })).map((product) => product.goodID));
+    const existingProducts = new Set((await Product.find({}, {goodID: 1})).map((product) => product.goodID));
 
     // Обработка пользователей
     const users = await User.find({});
@@ -496,7 +497,7 @@ const run = async () => {
       orders.map(async (order) => {
         order.products = order.products.filter((item) => existingProducts.has(item.product));
         if (order.products.length === 0) {
-          await Order.deleteOne({ _id: order._id });
+          await Order.deleteOne({_id: order._id});
         } else {
           await order.save();
         }
@@ -513,17 +514,17 @@ const run = async () => {
     );
 
     // Обработка бестселлеров
-    await Bestseller.deleteMany({ bestseller_id: { $nin: Array.from(existingProducts) } });
+    await Bestseller.deleteMany({bestseller_id: {$nin: Array.from(existingProducts)}});
 
     // Получаем список всех существующих категорий
-    const existingCategories = new Set((await Category.find({}, { ID: 1 })).map((category) => category.ID));
+    const existingCategories = new Set((await Category.find({}, {ID: 1})).map((category) => category.ID));
 
     // Обработка записей ProductFor
     const productFors = await ProductFor.find({});
     await Promise.all(
       productFors.map(async (productFor) => {
         if (!existingCategories.has(productFor.categoryID)) {
-          await ProductFor.deleteOne({ _id: productFor._id });
+          await ProductFor.deleteOne({_id: productFor._id});
           return;
         }
 
@@ -539,9 +540,20 @@ const run = async () => {
   await mongoose.connect(config.db);
 
   console.log('start - loading data...');
-  const responseProducts = await fetchData('goods-get');
-  const responseQuantity = await fetchData('goods-quantity-get');
-  const responsePrice = await fetchData('goods-price-get');
+  const dataDir = path.join(__dirname, 'data');
+  fs.mkdirSync(dataDir, {recursive: true});
+
+  const goodsFile = path.join(dataDir, 'goods.json');
+  const quantityFile = path.join(dataDir, 'quantity.json');
+  const priceFile = path.join(dataDir, 'price.json');
+
+  console.log('start - downloading data...');
+
+  await fetchAndSaveToFile('goods-get', goodsFile);
+  await fetchAndSaveToFile('goods-quantity-get', quantityFile);
+  await fetchAndSaveToFile('goods-price-get', priceFile);
+
+  console.log('finish - downloading data...');
 
   // //////////////////////////////////////////////////////
   // // Вместо ожидания результата запроса, сохраняем его в переменную
@@ -563,6 +575,10 @@ const run = async () => {
   // fs.writeFileSync(filePath3, JSON.stringify(responsePrice.result.goods, null, 2), 'utf-8');
   // /////////////////////////////////////////////////////////////////////
 
+  const responseProducts = JSON.parse(fs.readFileSync(goodsFile, 'utf-8'));
+  const responseQuantity = JSON.parse(fs.readFileSync(quantityFile, 'utf-8'));
+  const responsePrice = JSON.parse(fs.readFileSync(priceFile, 'utf-8'));
+
   const products: IProductFromApi[] = responseProducts.result.goods;
   const quantity = responseQuantity.result;
   const quantityGoods: IProductQuantityFromApi[] = quantity.goods;
@@ -582,9 +598,28 @@ const run = async () => {
     console.log('Collections were not present, skipping drop...');
   }
 
-  await createProducts(products, price, priceName, quantityGoods, quantityStocks, categories);
-  await createCategories(categories);
-  await cleanUpDatabase();
+  // await createProducts(products, price, priceName, quantityGoods, quantityStocks, categories);
+  // await createCategories(categories);
+  // await cleanUpDatabase();
+
+  const deleteDownloadedFiles = (files: string[]) => {
+    for (const file of files) {
+      if (fs.existsSync(file)) {
+        fs.unlinkSync(file);
+        console.log(`Удален файл: ${file}`);
+      }
+    }
+  };
+
+  try {
+    await createProducts(products, price, priceName, quantityGoods, quantityStocks, categories);
+    await createCategories(categories);
+    await cleanUpDatabase();
+
+    deleteDownloadedFiles([goodsFile, quantityFile, priceFile]);
+  } catch (e) {
+    console.error('Ошибка, файлы НЕ удалены');
+  }
 
   // //////////////////////////
   // // Функция для поиска товаров, которые не принадлежат ни одной категории
